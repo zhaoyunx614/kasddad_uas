@@ -741,3 +741,5 @@ body.cheatsheet { --accent: var(--ink-soft); }
   margin: 12px 0 8px;
   text-transform: uppercase;
 }
+
+.topic-card[data-topic="ws"] { --card-accent: #7c6af7; }
