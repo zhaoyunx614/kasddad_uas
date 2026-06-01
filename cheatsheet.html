@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheatsheet — KASDD Notebook</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="main.js"></script>
+<style>
+  .cheat-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+    margin: 24px 0;
+  }
+  @media (max-width: 720px) { .cheat-grid { grid-template-columns: 1fr; } }
+  .cheat-block {
+    padding: 16px 20px;
+    border-radius: 4px;
+    background: var(--paper);
+    border: 1px solid var(--paper-3);
+  }
+  .cheat-block h4 {
+    font-family: var(--serif);
+    font-size: 14px;
+    font-weight: 700;
+    margin: 0 0 10px;
+    color: var(--accent);
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .cheat-block.full { grid-column: span 2; }
+  @media (max-width: 720px) { .cheat-block.full { grid-column: auto; } }
+  .cheat-block p, .cheat-block li { font-size: 13.5px; margin-bottom: 6px; }
+  .cheat-block .katex { font-size: 0.95em !important; }
+  .cheat-block .katex-display { margin: 6px 0 !important; }
+  .cheat-block ul { margin-left: 18px; }
+</style>
+</head>
+<body class="cheatsheet">
+
+<nav class="topbar">
+  <a href="index.html" class="brand"><span class="mark">K</span> KASDD Notebook</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="probability.html">Probability</a></li>
+    <li><a href="linear-models.html">Linear Models</a></li>
+    <li><a href="clustering.html">Clustering</a></li>
+    <li><a href="neural-networks.html">Neural Networks</a></li>
+    <li><a href="exercises.html">Exercises</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+<aside class="sidebar">
+  <h4>Sections</h4>
+  <ul>
+    <li><a href="#prob">Probability & MLE</a></li>
+    <li><a href="#linear">Linear models</a></li>
+    <li><a href="#gd">Gradient descent</a></li>
+    <li><a href="#cluster">Clustering</a></li>
+    <li><a href="#nn">Neural networks</a></li>
+    <li><a href="#backprop">Backpropagation</a></li>
+    <li><a href="#tips">Final tips</a></li>
+  </ul>
+  <h4>Print</h4>
+  <ul>
+    <li><a href="javascript:window.print()">📄 Print this page</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+
+<h1 class="page-title"><span class="accent-bar"></span>The Cheatsheet</h1>
+<p class="subtitle">Every key formula in one printable page. Designed for the night before the exam.</p>
+
+<!-- ============= PROBABILITY ============= -->
+<h2 id="prob">1 — Probability & MLE</h2>
+
+<div class="cheat-grid">
+  <div class="cheat-block">
+    <h4>Bayes' theorem</h4>
+    $$P(C_i \mid A) = \frac{P(A \mid C_i)\, P(C_i)}{\sum_j P(A \mid C_j)\, P(C_j)}$$
+    <p>Prior × likelihood ÷ normalizer = posterior.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Law of total probability</h4>
+    $$P(A) = \sum_i P(A \mid C_i)\, P(C_i)$$
+    <p>Partition $\{C_i\}$ covers $\Omega$.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Likelihood & log-likelihood (i.i.d.)</h4>
+    $$L(\theta) = \prod_i p(x_i \mid \theta),\quad LL(\theta) = \sum_i \log p(x_i \mid \theta)$$
+    <p>Use log to convert product to sum, avoid underflow.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>MLE recipe</h4>
+    <ol>
+      <li>Write $LL(\theta) = \sum_i \log p(x_i \mid \theta)$.</li>
+      <li>$\dfrac{dLL}{d\theta} = 0$, solve.</li>
+      <li>Verify maximum (2nd derivative).</li>
+    </ol>
+  </div>
+
+  <div class="cheat-block full">
+    <h4>Common MLE closed forms</h4>
+    <ul>
+      <li>Bernoulli($p$): $\hat p = k/N$ (successes/trials).</li>
+      <li>Binomial($n, p$): $\hat p = (\sum_i x_i)/(Nn)$.</li>
+      <li>Categorical / Multinomial: $\hat\theta_k = N_k / N$ (relative frequency).</li>
+      <li>Poisson($\lambda$): $\hat\lambda = \bar x$.</li>
+      <li>Geometric($p$): $\hat p = 1/\bar x$.</li>
+      <li>Normal $\mathcal{N}(\mu, \sigma^2)$: $\hat\mu = \bar x$, $\hat\sigma^2 = \frac{1}{N}\sum_i (x_i - \hat\mu)^2$.</li>
+      <li>Exponential($\lambda$): $\hat\lambda = 1/\bar x$.</li>
+      <li>Uniform $[a, b]$: $\hat a = \min_i x_i$, $\hat b = \max_i x_i$.</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Naive Bayes</h4>
+    $$\hat y = \arg\max_y P(y) \prod_j P(x_j \mid y)$$
+    <p>Conditional independence given $y$. High bias, low variance.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Gaussian NB (numeric features)</h4>
+    $$P(x \mid y) = \tfrac{1}{\sqrt{2\pi\sigma_y^2}} e^{-(x-\mu_y)^2/(2\sigma_y^2)}$$
+    <p>Estimate $\mu_y, \sigma_y$ per class from training data.</p>
+  </div>
+</div>
+
+<!-- ============= LINEAR MODELS ============= -->
+<h2 id="linear">2 — Linear / Logistic / Softmax</h2>
+
+<div class="cheat-grid">
+  <div class="cheat-block full">
+    <h4>Master decision table</h4>
+    <table class="data" style="margin-top: 4px;">
+      <thead><tr><th>Task</th><th>Activation</th><th>Loss</th><th>Target</th></tr></thead>
+      <tbody>
+        <tr><td>Regression</td><td>Identity</td><td>MSE/SSE</td><td>$y \in \mathbb{R}$</td></tr>
+        <tr><td>Binary classification</td><td>Sigmoid</td><td>BCE</td><td>$y \in \{0,1\}$</td></tr>
+        <tr><td>Multi-class (one-hot)</td><td>Softmax</td><td>CCE</td><td>$\mathbf{y} \in \{0,1\}^K$</td></tr>
+        <tr><td>Multi-label</td><td>Sigmoid (each)</td><td>Sum of BCEs</td><td>$\mathbf{y} \in \{0,1\}^K$</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Linear regression</h4>
+    $$h_\mathbf{w}(\mathbf{x}) = \mathbf{w}^\top \mathbf{x}, \quad L = \tfrac{1}{2}\|\mathbf{Xw} - \mathbf{y}\|_2^2$$
+    $$\boxed{\mathbf{w}^* = (\mathbf{X}^\top\mathbf{X})^{-1}\mathbf{X}^\top \mathbf{y}}$$
+    <p>Closed form (normal equation).</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Logistic regression</h4>
+    $$h = \sigma(\mathbf{w}^\top\mathbf{x}),\; L = -\sum_i [y_i \log h_i + (1-y_i)\log(1-h_i)]$$
+    <p>No closed form. Sigmoid: $\sigma'(z) = \sigma(z)(1 - \sigma(z))$.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Softmax regression</h4>
+    $$s_k = \frac{e^{\mathbf{w}_k^\top \mathbf{x}}}{\sum_\ell e^{\mathbf{w}_\ell^\top \mathbf{x}}},\quad L = -\sum_i \mathbf{y}_i^\top \log \mathbf{s}_i$$
+    <p>$\mathbf{W} \in \mathbb{R}^{K \times D}$ (K rows, D cols). Total params $= K(D+1)$.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Regularization</h4>
+    <ul>
+      <li>L1 (Lasso): $+\lambda \sum_j |w_j|$ → sparsity (feature selection).</li>
+      <li>L2 (Ridge): $+\lambda \sum_j w_j^2$ → smooth shrinkage.</li>
+      <li>Large $\lambda$ → simpler model → <strong>underfit</strong> (not overfit!).</li>
+      <li>$\lambda = 0$ → no regularization.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============= GRADIENT DESCENT ============= -->
+<h2 id="gd">3 — Gradient descent</h2>
+
+<div class="cheat-grid">
+  <div class="cheat-block full">
+    <h4>The universal pattern</h4>
+    $$\nabla_\mathbf{w} L = \sum_i (\text{prediction}^{(i)} - \text{target}^{(i)}) \cdot \mathbf{x}^{(i)\top}$$
+    <p>True for linear, logistic, and softmax. Only "prediction" changes ($\mathbf{w}^\top\mathbf{x}$, $\sigma(\cdot)$, softmax respectively).</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Update rule</h4>
+    $$\mathbf{w} := \mathbf{w} - \alpha (\nabla_\mathbf{w} L)^\top$$
+    <p>For maximizing $\ell$: ascent ($+\alpha$). For minimizing NLL: descent ($-\alpha$). Same update, sign cancels.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>With regularization</h4>
+    <ul>
+      <li>L2: $\nabla J = \nabla L + 2\lambda \mathbf{w}$.</li>
+      <li>L1: $\nabla J = \nabla L + \lambda\, \text{sign}(\mathbf{w})$.</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Variants</h4>
+    <ul>
+      <li>Batch GD — 1 update per epoch. Accurate, slow.</li>
+      <li>SGD — 1 update per example. Fast, noisy.</li>
+      <li>Mini-batch — best compromise (modern default).</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Stopping criteria</h4>
+    <ul>
+      <li>Max iterations reached.</li>
+      <li>$\|\mathbf{w}' - \mathbf{w}\|_2^2 \leq \varepsilon^2$.</li>
+      <li>$|L' - L| \leq \varepsilon$.</li>
+      <li>$\|\nabla L\| \leq \varepsilon$.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============= CLUSTERING ============= -->
+<h2 id="cluster">4 — Clustering</h2>
+
+<div class="cheat-grid">
+  <div class="cheat-block">
+    <h4>Distance metrics</h4>
+    <ul>
+      <li>Euclidean (L2): $\sqrt{\sum_i (u_i - v_i)^2}$</li>
+      <li>Manhattan (L1): $\sum_i |u_i - v_i|$</li>
+      <li>Chebyshev (L∞): $\max_i |u_i - v_i|$</li>
+      <li>Cosine distance: $1 - \frac{\mathbf{u}^\top\mathbf{v}}{\|\mathbf{u}\|\|\mathbf{v}\|}$</li>
+      <li>Hamming: $\sum_i \mathbb{1}[u_i \neq v_i]$ (categorical)</li>
+      <li>Jaccard: $1 - \frac{|A \cap B|}{|A \cup B|}$ (binary sets)</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>K-Means</h4>
+    $$\text{SSE} = \sum_j \sum_{\mathbf{x} \in C_j} \|\mathbf{x} - \mathbf{m}_j\|_2^2$$
+    <p>Assign nearest centroid → recompute mean → repeat. $O(t \cdot k \cdot n)$. Sensitive to outliers; use K-Medoids for robustness.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Linkage methods (hierarchical)</h4>
+    <ul>
+      <li>Single: $\min(d(A,X), d(B,X))$ → chains.</li>
+      <li>Complete: $\max(d(A,X), d(B,X))$ → compact.</li>
+      <li>Average: $\text{avg}(d(A,X), d(B,X))$ → balanced.</li>
+      <li>Ward: minimize within-cluster SSE.</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Silhouette</h4>
+    $$S(o) = \frac{b(o) - a(o)}{\max(a(o), b(o))}$$
+    <ul>
+      <li>$a(o)$ = mean intra-cluster distance.</li>
+      <li>$b(o)$ = min mean distance to another cluster.</li>
+      <li>$S \in [-1, 1]$. Pick $k$ at peak.</li>
+      <li>$\geq 0.7$ strong, $0.5–0.7$ moderate, $\leq 0.25$ no structure.</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>External evaluation (pairs)</h4>
+    <ul>
+      <li>Precision = $\frac{TP}{TP + FP}$</li>
+      <li>Recall = $\frac{TP}{TP + FN}$</li>
+      <li>F1 = $\frac{2PR}{P+R}$</li>
+      <li>Rand Index = $\frac{TP + TN}{\text{all pairs}}$</li>
+      <li>Jaccard = $\frac{TP}{TP + FP + FN}$</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>K-Means vs K-Medoids</h4>
+    <ul>
+      <li>K-Means uses <em>mean</em> → sensitive to outliers, $O(n)$.</li>
+      <li>K-Medoids uses an actual data point → outlier-robust, $O(n^2)$.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============= NEURAL NETWORKS ============= -->
+<h2 id="nn">5 — Neural networks</h2>
+
+<div class="cheat-grid">
+  <div class="cheat-block">
+    <h4>Forward pass (one layer)</h4>
+    $$\mathbf{p}^{(\ell)} = \mathbf{W}^{(\ell)} \mathbf{a}^{(\ell-1)} + \mathbf{b}^{(\ell)}$$
+    $$\mathbf{a}^{(\ell)} = g^{(\ell)}(\mathbf{p}^{(\ell)})$$
+  </div>
+
+  <div class="cheat-block">
+    <h4>Parameter dimensions</h4>
+    <ul>
+      <li>$\mathbf{W}^{(\ell)}$ has shape $D_\ell \times D_{\ell-1}$ (output rows × input cols).</li>
+      <li>$\mathbf{b}^{(\ell)}$ has shape $D_\ell$.</li>
+      <li>Total params $= \sum_\ell (D_\ell D_{\ell-1} + D_\ell)$.</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block full">
+    <h4>Activation functions & derivatives</h4>
+    <table class="data" style="margin-top: 4px; font-size: 13px;">
+      <thead><tr><th>Function</th><th>$g(u)$</th><th>$g'(u)$</th></tr></thead>
+      <tbody>
+        <tr><td>Identity</td><td>$u$</td><td>$1$</td></tr>
+        <tr><td>Sigmoid</td><td>$1/(1+e^{-u})$</td><td>$g(u)(1-g(u))$</td></tr>
+        <tr><td>Tanh</td><td>$\tanh(u)$</td><td>$1 - \tanh^2(u)$</td></tr>
+        <tr><td>ReLU</td><td>$\max(0, u)$</td><td>$1$ if $u>0$, else $0$</td></tr>
+        <tr><td>Leaky ReLU</td><td>$u$ or $\alpha u$</td><td>$1$ or $\alpha$</td></tr>
+        <tr><td>Softplus</td><td>$\ln(1 + e^u)$</td><td>$\sigma(u)$ ← sigmoid!</td></tr>
+        <tr><td>ELU</td><td>$u$ or $\alpha(e^u-1)$</td><td>$1$ or $\alpha e^u$</td></tr>
+        <tr><td>Softmax</td><td>$e^{u_k}/\sum_\ell e^{u_\ell}$</td><td>$s_k(\mathbb{1}_{k=j} - s_j)$</td></tr>
+      </tbody>
+    </table>
+    <p style="margin-top: 8px;"><strong>Memorize:</strong> derivative of softplus = sigmoid. Comes up often in UAS.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Loss derivatives</h4>
+    <ul>
+      <li>MSE: $\partial L/\partial \mathbf{a}^{(L)} = \mathbf{a}^{(L)} - \mathbf{y}$.</li>
+      <li>BCE: $\partial L/\partial a^{(L)} = (a^{(L)} - y)/(a^{(L)}(1-a^{(L)}))$.</li>
+      <li>CCE: $\partial L/\partial a_k^{(L)} = -y_k/a_k^{(L)}$.</li>
+    </ul>
+  </div>
+
+  <div class="cheat-block">
+    <h4>⚡ The universal shortcut</h4>
+    <p>For these three pairings ONLY:</p>
+    $$\overline{\mathbf{p}^{(L)}} = \mathbf{a}^{(L)} - \mathbf{y}$$
+    <ul>
+      <li>Identity + MSE</li>
+      <li>Sigmoid + BCE</li>
+      <li>Softmax + CCE</li>
+    </ul>
+    <p>This is why they're the standard pairs.</p>
+  </div>
+</div>
+
+<!-- ============= BACKPROPAGATION ============= -->
+<h2 id="backprop">6 — Backpropagation recipe</h2>
+
+<div class="cheat-grid">
+  <div class="cheat-block full">
+    <h4>Step-by-step backward pass</h4>
+    <p><strong>Step 1.</strong> Forward: compute $\mathbf{p}^{(\ell)}, \mathbf{a}^{(\ell)}$ for $\ell = 1, \ldots, L$.</p>
+    <p><strong>Step 2.</strong> $\overline{L} = 1$.</p>
+    <p><strong>Step 3.</strong> Output: $\overline{\mathbf{p}^{(L)}} = \mathbf{a}^{(L)} - \mathbf{y}$ (if matching shortcut), or compute $\overline{\mathbf{a}^{(L)}} \odot g^{(L)\prime}(\mathbf{p}^{(L)})$.</p>
+    <p><strong>Step 4.</strong> For $\ell = L, L-1, \ldots, 1$:</p>
+    <ul>
+      <li>$\overline{\mathbf{W}^{(\ell)}} = \overline{\mathbf{p}^{(\ell)}} (\mathbf{a}^{(\ell-1)})^\top$ (outer product).</li>
+      <li>$\overline{\mathbf{b}^{(\ell)}} = \overline{\mathbf{p}^{(\ell)}}$.</li>
+      <li>$\overline{\mathbf{a}^{(\ell-1)}} = (\mathbf{W}^{(\ell)})^\top \overline{\mathbf{p}^{(\ell)}}$.</li>
+      <li>$\overline{\mathbf{p}^{(\ell-1)}} = \overline{\mathbf{a}^{(\ell-1)}} \odot g^{(\ell-1)\prime}(\mathbf{p}^{(\ell-1)})$.</li>
+    </ul>
+    <p><strong>Step 5.</strong> Update: $\mathbf{W}^{(\ell)} := \mathbf{W}^{(\ell)} - \alpha \overline{\mathbf{W}^{(\ell)}}$, similarly for $\mathbf{b}$.</p>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Memory trick</h4>
+    <p>Forward: multiply by $\mathbf{W}$ → add $\mathbf{b}$ → apply $g$.</p>
+    <p>Backward unwinds in reverse:</p>
+    <ol>
+      <li>Multiply elementwise by $g'$.</li>
+      <li>Copy to $\overline{\mathbf{b}}$.</li>
+      <li>Outer-product with $\mathbf{a}^{(\ell-1)}$ for $\overline{\mathbf{W}}$.</li>
+      <li>Multiply by $\mathbf{W}^\top$ for prev layer.</li>
+    </ol>
+  </div>
+
+  <div class="cheat-block">
+    <h4>Output activation by task</h4>
+    <ul>
+      <li>Regression → <strong>Identity</strong> + MSE.</li>
+      <li>Binary → <strong>Sigmoid</strong> + BCE.</li>
+      <li>Multi-class (one-hot) → <strong>Softmax</strong> + CCE.</li>
+      <li>Multi-label → <strong>Sigmoid each</strong> + sum of BCEs.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============= TIPS ============= -->
+<h2 id="tips">7 — Final exam tips</h2>
+
+<div class="box yellow">
+  <span class="box-label">Common gotchas</span>
+  <ul class="bullet">
+    <li>Always <strong>check the metric</strong> (Euclidean vs Manhattan) before computing distances — answers can differ drastically.</li>
+    <li>Softmax $\mathbf{W}$ has shape $K \times D$, <strong>not</strong> $D \times K$. Always: <em>rows = outputs, cols = inputs</em>.</li>
+    <li>Large regularization $\lambda$ → simpler model → <strong>underfit</strong>, not overfit.</li>
+    <li>L1 for feature selection, L2 for general smoothing.</li>
+    <li>GD <em>minimizes</em>; for maximizing log-likelihood, use gradient <strong>ascent</strong> — or equivalently GD on NLL.</li>
+    <li>Softmax output is always in $(0, 1)$ and sums to 1.</li>
+    <li>Derivative of <strong>softplus = sigmoid</strong>. Often tested in MLP problems.</li>
+    <li>NB is <em>conditionally</em> independent (given $y$), not unconditionally.</li>
+    <li>SMOTE goes only on the <em>training fold</em>, never on test data — and use stratified CV.</li>
+    <li>Accuracy is useless on imbalanced data. Use F1, ROC AUC, balanced metrics.</li>
+    <li>SVM: only <strong>support vectors</strong> change the boundary; non-SV points contribute nothing.</li>
+    <li>Decision trees are NOT trained with gradient descent (greedy splitting).</li>
+  </ul>
+</div>
+
+<div class="box green">
+  <span class="box-label">The three things you'll use most</span>
+  <p><strong>1. The universal gradient pattern</strong> for linear/logistic/softmax:</p>
+  $$\nabla_\mathbf{w} L = \sum_i (\text{prediction}^{(i)} - \text{target}^{(i)}) \cdot \mathbf{x}^{(i)\top}$$
+  <p><strong>2. The universal output-layer backprop shortcut</strong> (for the standard activation+loss pairs):</p>
+  $$\overline{\mathbf{p}^{(L)}} = \mathbf{a}^{(L)} - \mathbf{y}$$
+  <p><strong>3. Bayes' theorem</strong> — the foundation of generative modeling:</p>
+  $$P(y \mid \mathbf{x}) = \frac{P(\mathbf{x} \mid y) P(y)}{P(\mathbf{x})}$$
+</div>
+
+<div style="margin-top: 48px; padding: 24px; background: var(--paper-2); border-radius: 6px; text-align: center;">
+  <p style="font-family: var(--serif); font-size: 20px; color: var(--ink); margin: 0;">Good luck on the UAS! 🎓</p>
+</div>
+
+</main>
+</div>
+
+<footer>
+  KASDD Notebook · <a href="javascript:window.print()">Print this cheatsheet</a> · <a href="index.html">Back to home</a>
+</footer>
+
+</body>
+</html>

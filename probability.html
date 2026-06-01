@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Likelihood & Bayes — KASDD Notebook</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="main.js"></script>
+</head>
+<body class="prob">
+
+<nav class="topbar">
+  <a href="index.html" class="brand"><span class="mark">K</span> KASDD Notebook</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="probability.html">Probability</a></li>
+    <li><a href="linear-models.html">Linear Models</a></li>
+    <li><a href="clustering.html">Clustering</a></li>
+    <li><a href="neural-networks.html">Neural Networks</a></li>
+    <li><a href="exercises.html">Exercises</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+<aside class="sidebar">
+  <h4>On this page</h4>
+  <ul>
+    <li><a href="#basic">Basic probability</a></li>
+    <li><a href="#conditional">Conditional probability</a></li>
+    <li><a href="#total">Law of total probability</a></li>
+    <li><a href="#bayes">Bayes' theorem</a></li>
+    <li><a href="#likelihood">Likelihood & MLE</a></li>
+    <li><a href="#why-log">Why log-likelihood?</a></li>
+    <li><a href="#distributions">Distribution catalog</a></li>
+    <li><a href="#worked">Worked examples</a></li>
+    <li><a href="#nb">Naive Bayes</a></li>
+  </ul>
+  <h4>Quick links</h4>
+  <ul>
+    <li><a href="exercises.html#prob">Practice problems</a></li>
+    <li><a href="cheatsheet.html#prob">Formula reference</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+
+<h1 class="page-title"><span class="accent-bar"></span>Likelihood &amp; Bayes</h1>
+<p class="subtitle">Probability axioms, conditional probability, Bayes' theorem, and maximum likelihood estimation — the foundations everything else builds on.</p>
+
+<!-- ============= BASIC ============ -->
+<h2 id="basic">1. Basic probability concepts</h2>
+
+<p>The <strong>sample space</strong> $\Omega$ is the set of all possible outcomes. An <strong>event</strong> is a subset of the sample space. The probability $P(A)$ states how likely event $A$ occurs, with $0 \leq P(A) \leq 1$.</p>
+
+<h3>The three axioms</h3>
+<ul class="bullet">
+  <li><strong>Non-negativity:</strong> $P(A) \geq 0$ for all $A \subseteq \Omega$.</li>
+  <li><strong>Normalization:</strong> $P(\Omega) = 1$ — something in the sample space must happen.</li>
+  <li><strong>Additivity</strong> (for mutually exclusive events): $P(A_1 \cup A_2 \cup \cdots) = P(A_1) + P(A_2) + \cdots$</li>
+</ul>
+
+<p>Two derived rules you use all the time:</p>
+
+<div class="box gray">
+  <span class="box-label">Derived rules</span>
+  $$P(A \cup B) = P(A) + P(B) - P(A \cap B), \qquad P(A^c) = 1 - P(A).$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $\Omega$ = sample space; $A, B$ = events (subsets of $\Omega$); $A \cup B$ = "A or B"; $A \cap B$ = "A and B"; $A^c$ = complement of $A$ (i.e. $A$ does not occur).
+</div>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA Example — Curry's free throw</span>
+  <p><strong>Formula (relative frequency):</strong> $P(E) = \frac{\#\text{occurrences of }E}{\#\text{trials}}$</p>
+  <p><strong>Setup.</strong> Stephen Curry: 9234 free throws attempted, 8543 made. Sample space $\Omega = \{\text{Make}, \text{Miss}\}$.</p>
+  <p><strong>Substitution.</strong> $P(\text{Make}) = \dfrac{8543}{9234} \approx 0.925.$ The probability is derived from observation data — the relative frequency approach.</p>
+</div>
+
+<!-- ============= CONDITIONAL ============ -->
+<h2 id="conditional">2. Conditional probability</h2>
+
+<div class="box gray">
+  <span class="box-label">Conditional probability</span>
+  $$P(A \mid B) = \frac{P(A, B)}{P(B)}, \quad P(B) > 0.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $P(A \mid B)$ = probability of $A$ given that $B$ has occurred; $P(A, B) = P(A \cap B)$ = joint probability (both happen); $P(B)$ = marginal probability of $B$ (must be positive so we don't divide by zero).
+</div>
+
+<p>From this we derive the <strong>product rule</strong>, which says the same joint can be factored two ways:</p>
+
+<div class="box gray">
+  <span class="box-label">Product rule</span>
+  $$P(A, B) = P(A \mid B)P(B) = P(B \mid A)P(A).$$
+</div>
+
+<!-- ============= TOTAL ============ -->
+<h2 id="total">3. Law of total probability</h2>
+
+<p>If $C_1, \ldots, C_n$ form a <em>partition</em> of $\Omega$ (mutually exclusive and exhaustive):</p>
+
+<div class="box gray">
+  <span class="box-label">Law of total probability</span>
+  $$P(A) = \sum_{i=1}^{n} P(A \mid C_i) P(C_i).$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $C_1, \ldots, C_n$ partition the sample space; $P(A \mid C_i)$ = probability of $A$ inside scenario $C_i$; $P(C_i)$ = probability of being in scenario $C_i$. The formula adds contributions from every scenario.
+</div>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA Example — LeBron three-point shooting</span>
+  <p><strong>Formula:</strong> $P(\text{Make}) = \sum_i P(\text{Make} \mid \text{Zone}_i)\, P(\text{Zone}_i)$</p>
+  <p><strong>Setup.</strong> Make rates: open look 40%, contested 30%, transition 55%. Zone distribution: 50% open, 30% contested, 20% transition.</p>
+  <p><strong>Substitution.</strong></p>
+  $$P(\text{Make}) = (0.40)(0.50) + (0.30)(0.30) + (0.55)(0.20) = 0.20 + 0.09 + 0.11 = 0.40.$$
+  <p>LeBron has an overall 40% make rate considering all zones.</p>
+</div>
+
+<!-- ============= BAYES ============ -->
+<h2 id="bayes">4. Bayes' theorem</h2>
+
+<div class="box gray">
+  <span class="box-label">Bayes' theorem (the centerpiece)</span>
+  $$P(Y\!=\!y \mid X\!=\!x) = \frac{P(X\!=\!x \mid Y\!=\!y)\, P(Y\!=\!y)}{P(X\!=\!x)} = \frac{P(X\!=\!x \mid Y\!=\!y)\, P(Y\!=\!y)}{\sum_{y'} P(X\!=\!x \mid Y\!=\!y')\, P(Y\!=\!y')}.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $Y$ = hidden quantity we want to infer (disease state, true class); $X$ = observed data; $P(Y\!=\!y)$ = <em>prior</em> (belief about $Y$ before seeing data); $P(X\!=\!x \mid Y\!=\!y)$ = <em>likelihood</em> (how well hypothesis $y$ explains observed $x$); $P(Y\!=\!y \mid X\!=\!x)$ = <em>posterior</em> (updated belief); $P(X\!=\!x)$ = normalization constant (sum over every possible $y'$ so probabilities total 1).
+</div>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA Example — ACL injury diagnosis</span>
+  <p><strong>Setup.</strong> Sensitivity $P(\text{Positive} \mid \text{ACL}) = 0.95$; false-positive rate $P(\text{Positive} \mid \text{No ACL}) = 0.10$; prior $P(\text{ACL}) = 0.02$.</p>
+  <p><strong>Step 1 — denominator</strong> (law of total probability):</p>
+  $$P(\text{Positive}) = (0.95)(0.02) + (0.10)(0.98) = 0.019 + 0.098 = 0.117.$$
+  <p><strong>Step 2 — apply Bayes:</strong></p>
+  $$P(\text{ACL} \mid \text{Positive}) = \frac{(0.95)(0.02)}{0.117} \approx 0.162.$$
+  <p>Although the test is accurate, because ACL injuries are <em>rare</em>, only ≈16% of positive results actually correspond to ACL injuries. This is the famous <strong>base-rate effect</strong>.</p>
+</div>
+
+<!-- ============= LIKELIHOOD ============ -->
+<h2 id="likelihood">5. Likelihood and MLE</h2>
+
+<p>The <strong>likelihood</strong> of a parameter $\theta$ given observed data $x$ is just the probability of that data treating $\theta$ as the variable:</p>
+
+<div class="box gray">
+  <span class="box-label">Likelihood (single observation)</span>
+  $$L(\theta \mid X\!=\!x) = P(X\!=\!x \mid \theta).$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> Numerically equal to the probability, but we treat $x$ as <em>fixed</em> and vary $\theta$. The likelihood is a function of $\theta$, not of $x$.
+</div>
+
+<p>For an i.i.d. (independent &amp; identically distributed) dataset $\mathcal{D} = \{x_1, \ldots, x_N\}$:</p>
+
+<div class="box gray">
+  <span class="box-label">Likelihood & log-likelihood for an i.i.d. sample</span>
+  $$L(\theta) = \prod_{i=1}^{N} p(x_i \mid \theta), \qquad LL(\theta) = \log L(\theta) = \sum_{i=1}^{N} \log p(x_i \mid \theta).$$
+</div>
+
+<p><strong>Maximum Likelihood Estimation (MLE)</strong> finds the $\theta$ that makes the observed data most probable:</p>
+
+$$\hat\theta_{\text{MLE}} = \arg\max_\theta L(\theta) = \arg\max_\theta LL(\theta) = \arg\min_\theta \text{NLL}(\theta).$$
+
+<p>where $\text{NLL}(\theta) = -LL(\theta)$ is the <strong>negative log-likelihood</strong> — what we usually <em>minimize</em> in practice.</p>
+
+<!-- ============= WHY LOG ============ -->
+<h2 id="why-log">6. Why log-likelihood?</h2>
+
+<div class="box yellow">
+  <span class="box-label">The numerical reason for using log</span>
+  <p><strong>Problem.</strong> Since each $p(x_i \mid \theta) < 1$, multiplying many small values shrinks toward zero (numerical <em>underflow</em>). Example: if $N = 1000$ and $p \approx 0.5$, then</p>
+  $$L(p) = 0.5^{1000} \approx 7.8 \times 10^{-31} \;-\; \text{too small for computer precision.}$$
+  <p><strong>Solution.</strong> The logarithm identity $\log(a \cdot b) = \log a + \log b$ converts multiplication into addition. For the example above, $LL = \log(7.8 \times 10^{-31}) \approx -69.31$ — safely handled.</p>
+  <p>Since log is <em>monotonically increasing</em>, the optimum doesn't change:</p>
+  $$\arg\max_\theta L(\theta) = \arg\max_\theta LL(\theta).$$
+</div>
+
+<!-- ============= DISTRIBUTIONS CATALOG ============ -->
+<h2 id="distributions">7. Distribution catalog (PMF/PDF + MLE)</h2>
+
+<p>For each distribution we list: the PMF/PDF, the log-likelihood for an i.i.d. sample of size $N$, and the closed-form MLE.</p>
+
+<h3>Discrete distributions</h3>
+
+<div class="box blue">
+  <span class="box-label">1 · Bernoulli(p) — single yes/no trial, $x \in \{0,1\}$</span>
+  $$p(x \mid p) = p^{x}(1-p)^{1-x}, \qquad LL(p) = k \log p + (N-k)\log(1-p),$$
+  $$\boxed{\;\hat p_{\text{MLE}} = \frac{k}{N}\;}$$
+  <p>where $k = \sum_i x_i$ = number of successes. The MLE = relative frequency.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">2 · Binomial(n, p) — n Bernoulli trials counted, $x \in \{0,\ldots,n\}$</span>
+  $$p(x \mid n, p) = \binom{n}{x} p^x (1-p)^{n-x}, \qquad \boxed{\;\hat p_{\text{MLE}} = \frac{\sum_i x_i}{Nn}\;}$$
+  <p>Total successes divided by total trials. The $\binom{n}{x}$ factor doesn't depend on $p$ and drops out.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">3 · Categorical($\boldsymbol\theta$) — one trial with K outcomes, one-hot $\mathbf{x}$</span>
+  $$p(\mathbf{x} \mid \boldsymbol\theta) = \prod_{k=1}^{K} \theta_k^{x_k}, \quad \sum_k \theta_k = 1, \qquad \boxed{\;\hat\theta_k = \frac{N_k}{N}\;}$$
+  <p>where $N_k$ = number of observations in category $k$. MLE = relative frequency.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">4 · Multinomial(n, $\boldsymbol\theta$) — n categorical trials counted by category</span>
+  $$p(\mathbf{x} \mid n, \boldsymbol\theta) = \frac{n!}{x_1! \cdots x_K!} \prod_{k=1}^{K} \theta_k^{x_k}, \qquad \boxed{\;\hat\theta_k = \frac{\sum_i x_{i,k}}{Nn}\;}$$
+</div>
+
+<div class="box blue">
+  <span class="box-label">5 · Poisson($\lambda$) — counts in a fixed interval, $x \in \{0,1,2,\ldots\}$</span>
+  $$p(x \mid \lambda) = \frac{\lambda^x e^{-\lambda}}{x!}, \qquad LL(\lambda) = \sum_i \left[x_i \log\lambda - \lambda - \log x_i!\right],$$
+  $$\boxed{\;\hat\lambda_{\text{MLE}} = \bar x = \tfrac{1}{N}\sum_i x_i\;}$$
+  <p>The MLE is the sample mean. (The $\log x_i!$ term is constant in $\lambda$ and drops out.)</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">6 · Geometric(p) — trials until first success, $x \in \{1,2,\ldots\}$</span>
+  $$p(x \mid p) = (1-p)^{x-1} p, \qquad \boxed{\;\hat p_{\text{MLE}} = \frac{1}{\bar x}\;}$$
+</div>
+
+<h3>Continuous distributions</h3>
+
+<div class="box blue">
+  <span class="box-label">7 · Normal $\mathcal{N}(\mu, \sigma^2)$</span>
+  $$p(x \mid \mu, \sigma^2) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\!\left(-\frac{(x-\mu)^2}{2\sigma^2}\right),$$
+  $$\boxed{\;\hat\mu_{\text{MLE}} = \bar x, \quad \hat\sigma^2_{\text{MLE}} = \tfrac{1}{N}\sum_i (x_i - \hat\mu)^2\;}$$
+  <p>Note: MLE variance divides by $N$, not $N-1$ — a famously "biased" estimator.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">8 · Exponential($\lambda$) — time between Poisson events, $x \geq 0$</span>
+  $$p(x \mid \lambda) = \lambda e^{-\lambda x}, \qquad LL(\lambda) = N\log\lambda - \lambda\sum_i x_i,$$
+  $$\boxed{\;\hat\lambda_{\text{MLE}} = \frac{1}{\bar x} = \frac{N}{\sum_i x_i}\;}$$
+</div>
+
+<div class="box blue">
+  <span class="box-label">9 · Uniform on $[a, b]$</span>
+  $$p(x \mid a, b) = \frac{1}{b-a} \text{ for } x \in [a,b], \;0 \text{ otherwise}.$$
+  $$\boxed{\;\hat a_{\text{MLE}} = \min_i x_i, \quad \hat b_{\text{MLE}} = \max_i x_i\;}$$
+  <p>The endpoints are the most extreme observations.</p>
+</div>
+
+<div class="box yellow">
+  <span class="box-label">General two-step MLE recipe</span>
+  <ol class="bullet">
+    <li>Write the log-likelihood $LL(\theta) = \sum_i \log p(x_i \mid \theta)$.</li>
+    <li>Take $\dfrac{dLL}{d\theta}$, set to zero, solve for $\theta$.</li>
+    <li>Verify it's a maximum (second derivative or boundary check).</li>
+  </ol>
+</div>
+
+<!-- ============= WORKED ============ -->
+<h2 id="worked">8. Worked examples</h2>
+
+<h3>Example A — MLE for a Bernoulli coin</h3>
+<p>A coin is tossed 5 times, results $\{H, H, H, H, T\}$. Bernoulli with $p = P(H)$:</p>
+$$L(p) = p^{4}(1-p)^{1}, \qquad LL(p) = 4\log p + \log(1-p), \qquad \frac{dLL}{dp} = \frac{4}{p} - \frac{1}{1-p}.$$
+<p>Setting $\dfrac{dLL}{dp} = 0$:</p>
+$$\frac{4}{p} = \frac{1}{1-p} \;\Longrightarrow\; 4(1-p) = p \;\Longrightarrow\; \hat p = \frac{4}{5} = 0.8.$$
+<p>This equals the relative frequency $\#H/(\#H + \#T)$, as expected.</p>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA Example — Klay Thompson's FT%</span>
+  <p>Klay shoots $n = 8$ free throws, makes $k = 7$.</p>
+  $$L(p) = p^{7}(1-p)^{1}, \qquad LL(p) = 7\log p + \log(1-p),$$
+  $$\frac{dLL}{dp} = \frac{7}{p} - \frac{1}{1-p} = 0 \;\Longrightarrow\; \hat p_{\text{MLE}} = \frac{7}{8} = 0.875.$$
+  <p>His FT% estimate from this small sample is 87.5%.</p>
+</div>
+
+<h3>Example B — When MLE overfits (small sample)</h3>
+<div class="box yellow">
+  <span class="box-label">Tutorial problem — coin all heads</span>
+  <p>A coin is tossed 3 times, results $\{H,H,H\}$. Then $L(\theta) = \theta^3$, $LL(\theta) = 3\log\theta$, and $\dfrac{dLL}{d\theta} = \dfrac{3}{\theta} > 0$ everywhere — $LL$ is monotonically increasing on $[0,1]$, so the maximum is at $\theta = 1$.</p>
+  <p>Mathematically: $\hat\theta_{\text{MLE}} = 1$. <strong>Physically: nonsense</strong> — a real coin doesn't have $P(H) = 1$. Lesson: MLE trusts small samples too much. Use priors (MAP) or get more data.</p>
+</div>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA analogue</span>
+  <p>Giannis takes 3 free throws, makes all 3. MLE says $\hat p_{\text{MLE}} = 3/3 = 1.0$ (100%). But his career FT% is ≈ 70%. <strong>Three samples isn't enough to override a strong prior.</strong></p>
+</div>
+
+<!-- ============= NAIVE BAYES ============ -->
+<h2 id="nb">9. Naive Bayes classifier</h2>
+
+<p>The <strong>Naive Bayes</strong> classifier is Bayes' theorem with an extra assumption: features are <em>conditionally independent</em> given the class.</p>
+
+<div class="box gray">
+  <span class="box-label">The Naive Bayes assumption</span>
+  $$P(x_1, x_2, \ldots, x_d \mid y) = \prod_{j=1}^{d} P(x_j \mid y).$$
+  <p>This is the assumption that features are independent <em>given $y$</em>. They are <strong>not</strong> assumed to be unconditionally independent — that would be much stronger.</p>
+</div>
+
+<p>Combined with Bayes' theorem, the classifier picks:</p>
+$$\hat y = \arg\max_y P(y) \prod_{j=1}^{d} P(x_j \mid y).$$
+
+<h3>Mixed feature types (categorical + Gaussian)</h3>
+
+<p>In practice, datasets mix categorical features (e.g. "rainfall: low/medium/high") with numeric ones (e.g. "temperature in °C"). Naive Bayes handles both:</p>
+
+<ul class="bullet">
+  <li><strong>Categorical features:</strong> use frequency estimates (often with Laplace smoothing to avoid zero counts).</li>
+  <li><strong>Numeric features:</strong> assume a Gaussian per class — $P(x \mid y) = \frac{1}{\sqrt{2\pi\sigma_y^2}}\exp\!\left(-\frac{(x - \mu_y)^2}{2\sigma_y^2}\right)$, with $\mu_y$ and $\sigma_y^2$ estimated from the training data of class $y$.</li>
+</ul>
+
+<div class="box yellow">
+  <span class="box-label">Tutorial — categorical MLE with 3 classes</span>
+  <p>Sentiment data $\mathcal{D} = \{\text{Pos}, \text{Pos}, \text{Pos}, \text{Neu}, \text{Neu}, \text{Neg}\}$ (6 points). With parameters $(\theta_1, \theta_2, \theta_3)$ for (Positive, Neutral, Negative):</p>
+  $$\hat\theta_1 = \tfrac{3}{6} = 0.5, \quad \hat\theta_2 = \tfrac{2}{6} \approx 0.333, \quad \hat\theta_3 = \tfrac{1}{6} \approx 0.167.$$
+  <p>Maximum likelihood score:</p>
+  $$L_{\max} = (0.5)^3 (0.333)^2 (0.167)^1 \approx 0.00231.$$
+</div>
+
+<p>You'll see the full mixed Naive Bayes example (Soal 11 from UAS 2023/2024) worked out step by step in the <a href="exercises.html#prob">Exercises page</a>.</p>
+
+<div class="box yellow">
+  <span class="box-label">Naive Bayes characterization (UAS 2023 Soal 1)</span>
+  <p>Naive Bayes has <strong>high bias</strong> (strong conditional independence assumption) and <strong>low variance</strong>. The claim "variance higher than bias" is FALSE.</p>
+</div>
+
+<div style="margin-top: 48px; padding: 24px; background: var(--paper-2); border-radius: 6px; text-align: center;">
+  <p style="font-family: var(--serif); font-size: 18px; color: var(--ink); margin-bottom: 8px;">Next up:</p>
+  <a href="linear-models.html" class="btn" style="background: var(--accent-linear); color: var(--paper); padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">→ Linear, Logistic & Softmax Regression</a>
+</div>
+
+</main>
+</div>
+
+<footer>
+  KASDD Notebook · <a href="exercises.html#prob">Practice this topic</a> · <a href="cheatsheet.html">All formulas</a>
+</footer>
+
+</body>
+</html>

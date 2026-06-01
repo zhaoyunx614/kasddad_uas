@@ -1,0 +1,1206 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Exercises — KASDD Notebook</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="main.js"></script>
+</head>
+<body class="exercises">
+
+<nav class="topbar">
+  <a href="index.html" class="brand"><span class="mark">K</span> KASDD Notebook</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="probability.html">Probability</a></li>
+    <li><a href="linear-models.html">Linear Models</a></li>
+    <li><a href="clustering.html">Clustering</a></li>
+    <li><a href="neural-networks.html">Neural Networks</a></li>
+    <li><a href="exercises.html">Exercises</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+<aside class="sidebar">
+  <h4>Filter by exam</h4>
+  <ul>
+    <li><a href="#part1">Part I — UAS 2023/2024</a></li>
+    <li><a href="#part2">Part II — UAS 2021</a></li>
+    <li><a href="#part3">Part III — UAS 2021/22 Essay</a></li>
+    <li><a href="#part4">Part IV — UAS Gasal 2023</a></li>
+    <li><a href="#part5">Part V — Clustering</a></li>
+  </ul>
+  <h4>Filter by topic</h4>
+  <ul>
+    <li><a href="#prob">Probability / Naive Bayes</a></li>
+    <li><a href="#linear">Linear / Logistic / Softmax</a></li>
+    <li><a href="#cluster">Clustering</a></li>
+    <li><a href="#nn">Neural networks</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+
+<h1 class="page-title"><span class="accent-bar"></span>Exercises</h1>
+<p class="subtitle">Every UAS problem from the past five years, reconstructed as an interactive quiz. Click an answer to check it; click "Show solution" for the full step-by-step working.</p>
+
+<div class="filter-bar">
+  <span class="filter-label">Show:</span>
+  <button data-filter="all" class="active">All</button>
+  <button data-filter="prob">Probability</button>
+  <button data-filter="linear">Linear/Logistic/Softmax</button>
+  <button data-filter="cluster">Clustering</button>
+  <button data-filter="nn">Neural Networks</button>
+  <button data-filter="imbalanced">Imbalanced/Other</button>
+</div>
+
+<!-- ============================================== -->
+<!-- PART I — UAS 2023/2024 -->
+<!-- ============================================== -->
+<h2 id="part1">Part I — UAS Genap 2023/2024</h2>
+<p class="subtitle" style="margin-bottom: 24px; font-size: 16px;">Twelve mixed problems covering Naive Bayes, gradient descent, regularization, MLP, and more.</p>
+
+<!-- Soal 1 -->
+<div class="exercise" data-topic="prob" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Naive Bayes</span><span>UAS 2023/24 · Soal 1</span></div>
+  <h3>1. Naive Bayes Assumption</h3>
+  <div class="ex-body">
+    <p>Which of the following statements correctly describes the Naive Bayes assumption for features $x_1, x_2, x_3$ and class label $y$? (Select TRUE statements.)</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> $x_1, x_2, x_3$ are unconditionally independent of one another.</li>
+    <li><span class="opt-letter">B.</span> If $y$ is known, $x_1, x_2, x_3$ are independent of each other.</li>
+    <li><span class="opt-letter">C.</span> $P(x_1, x_2, x_3 \mid y) = P(x_1 \mid y) P(x_2 \mid y) P(x_3 \mid y)$.</li>
+    <li><span class="opt-letter">D.</span> $P(y \mid \mathbf{x}) = P(y)P(\mathbf{x} \mid y) / P(\mathbf{x})$ (this is the NB assumption).</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>Correct: B and C.</strong></p>
+    <p>The NB assumption is <em>conditional independence given the class</em> — not unconditional independence. So A is too strong (false). D is just Bayes' theorem, which holds always — it isn't the NB assumption itself.</p>
+    <p>The factorization $P(x_1, x_2, x_3 \mid y) = \prod_j P(x_j \mid y)$ in option C is the mathematical expression of conditional independence, which is exactly the NB assumption.</p>
+  </div>
+</div>
+
+<!-- Soal 2 -->
+<div class="exercise" data-topic="linear" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Encoding + Models</span><span>UAS 2023/24 · Soal 2</span></div>
+  <h3>2. One-hot encoding and model choice</h3>
+  <div class="ex-body">
+    <p>Features: weight (1 numeric), height (1 numeric), gender (categorical, 2 values), age (1 numeric), catheter type (categorical, 3 values), duration (1 numeric). What is the total length of $\mathbf{x}$ after one-hot encoding?</p>
+    <p>For three target variables:</p>
+    <ul class="bullet">
+      <li>$y_1$ = infected (yes/no)</li>
+      <li>$y_2$ = severity (low/medium/high)</li>
+      <li>$y_3$ = number of recovery days</li>
+    </ul>
+    <p>What model and parameter shapes are appropriate?</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>Length of $\mathbf{x}$:</strong> $1 + 1 + 2 + 1 + 3 + 1 = 9$. Contains binary elements from the one-hot encoding.</p>
+    <p><strong>Model choices:</strong></p>
+    <ul class="bullet">
+      <li>$y_1$ (binary): <strong>logistic regression</strong>, $y_1 = \sigma(\mathbf{w}^\top \mathbf{x} + b)$, $\mathbf{w}$ length 9, $b$ scalar.</li>
+      <li>$y_2$ (3 classes): <strong>softmax regression</strong>, $\mathbf{W} \in \mathbb{R}^{3 \times 9}$, $\mathbf{b} \in \mathbb{R}^3$.</li>
+      <li>$y_3$ (continuous): <strong>linear regression</strong>, $y_3 = \mathbf{w}^\top \mathbf{x} + b$, $\mathbf{w}$ length 9, $b$ scalar.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Soal 3 -->
+<div class="exercise" data-topic="linear" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Gradient Descent</span><span>UAS 2023/24 · Soal 3</span></div>
+  <h3>3. Gradient Descent — correct statements</h3>
+  <div class="ex-body">
+    <p>For the update $\mathbf{w}_b = \mathbf{w}_a - \alpha \nabla E(\mathbf{w}_a)$, which statements are TRUE?</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> $(\mathbf{w}_b - \mathbf{w}_a)$ points in the opposite direction of $\partial E/\partial \mathbf{w}_a$.</li>
+    <li><span class="opt-letter">B.</span> If $\|\mathbf{w}_b - \mathbf{w}_a\| \to 0$, we are approaching a local minimum.</li>
+    <li><span class="opt-letter">C.</span> A large learning rate makes movement fast but risks failing to converge.</li>
+    <li><span class="opt-letter">D.</span> Batch GD (using all data) is always more efficient than SGD.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>Correct: A, B, C.</strong> D is false — batch GD is more <em>accurate</em> per step but much <em>slower</em> computationally; SGD is far more efficient per update.</p>
+  </div>
+</div>
+
+<!-- Soal 4 -->
+<div class="exercise" data-topic="prob" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">MLE</span><span>UAS 2023/24 · Soal 4</span></div>
+  <h3>4. Bernoulli likelihood</h3>
+  <div class="ex-body">
+    <p>Data $\mathcal{D} = (1, 1, 1, 0, 0)$ — 3 successes, 2 failures. Which statements are TRUE?</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> $L(p) = p^3(1-p)^2$.</li>
+    <li><span class="opt-letter">B.</span> $L$ achieves its maximum when $p = 3/5 = 0.6$.</li>
+    <li><span class="opt-letter">C.</span> We estimate $p$ by finding the <em>minimum</em> of $L$.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>Correct: A and B.</strong> Statement C is false — MLE seeks the <em>maximum</em>, not the minimum, of the likelihood.</p>
+    <p>Verification: $LL(p) = 3\log p + 2\log(1-p)$. Set $\frac{dLL}{dp} = \frac{3}{p} - \frac{2}{1-p} = 0 \Rightarrow 3(1-p) = 2p \Rightarrow p = 3/5 = 0.6$. ✓</p>
+  </div>
+</div>
+
+<!-- Soal 5 -->
+<div class="exercise" data-topic="linear" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Regularization</span><span>UAS 2023/24 · Soal 5</span></div>
+  <h3>5. L1 and L2 regularization</h3>
+  <div class="ex-body">
+    <p>Select the TRUE statements about L1 and L2 regularization:</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> L2 regularization adds $\lambda \mathbf{w}^\top \mathbf{w}$ with $\lambda$ a hyperparameter.</li>
+    <li><span class="opt-letter">B.</span> If $\lambda$ on L2 is very large, all parameters tend toward 0.</li>
+    <li><span class="opt-letter">C.</span> The L1 norm (Lasso) drives some elements of $\mathbf{w}$ exactly to 0.</li>
+    <li><span class="opt-letter">D.</span> If $\lambda = 0$, the loss $J$ is still regularized.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>Correct: A, B, C.</strong> D is false — if $\lambda = 0$, the penalty term vanishes, so the loss is NOT regularized.</p>
+  </div>
+</div>
+
+<!-- Soal 6 -->
+<div class="exercise" data-topic="nn" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">MLP Activation</span><span>UAS 2023/24 · Soal 6</span></div>
+  <h3>6. MLP activation functions</h3>
+  <div class="ex-body">
+    <p>Which statements are TRUE?</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> If all layers use linear activation, MLP is equivalent to linear regression.</li>
+    <li><span class="opt-letter">B.</span> Hidden linear + 1 output sigmoid is equivalent to logistic regression.</li>
+    <li><span class="opt-letter">C.</span> Softmax outputs at the final layer are independent of each other.</li>
+    <li><span class="opt-letter">D.</span> Output activation is chosen without considering the task.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>Correct: A and B only.</strong> Composing linear maps gives a linear map; linear hidden + sigmoid output = logistic regression.</p>
+    <p>C is false: softmax outputs are <em>not</em> independent — the denominator normalizes across ALL units. D is also false: output activation is task-dependent (sigmoid for binary, softmax for multi-class, identity for regression).</p>
+  </div>
+</div>
+
+<!-- Soal 7 -->
+<div class="exercise" data-topic="linear" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Cross-entropy</span><span>UAS 2023/24 · Soal 7</span></div>
+  <h3>7. Softmax cross-entropy</h3>
+  <div class="ex-body">
+    <p>Softmax output $\mathbf{p} = [0.2, 0.1, 0.5, 0.2]$, target one-hot $\mathbf{t} = [1, 0, 0, 0]$ (class A). What is the cross-entropy loss?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> $-\log(0.5) \approx 0.693$</li>
+    <li><span class="opt-letter">B.</span> $-\log(0.1) \approx 2.303$</li>
+    <li><span class="opt-letter">C.</span> $-\log(0.2) \approx 1.609$</li>
+    <li><span class="opt-letter">D.</span> $-(0.2 + 0.1 + 0.5 + 0.2) = -1$</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>$L = -\sum_k t_k \log p_k$. Since only $t_1 = 1$:</p>
+    $$L = -(1 \cdot \log 0.2 + 0 + 0 + 0) = -\log(0.2) \approx 1.609.$$
+  </div>
+</div>
+
+<!-- Soal 8 -->
+<div class="exercise" data-topic="imbalanced" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Imbalanced</span><span>UAS 2023/24 · Soal 8</span></div>
+  <h3>8. SMOTE vs Borderline-SMOTE</h3>
+  <div class="ex-body">
+    <p>A visualization shows synthetic minority data generated <em>throughout the minority region</em> (not focused near the decision boundary), some of it close to noise. Which statement is INCORRECT?</p>
+  </div>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> Method A is Borderline-SMOTE.</li>
+    <li><span class="opt-letter">B.</span> Method A may introduce synthetic points near noise.</li>
+    <li><span class="opt-letter">C.</span> Method A creates synthetic samples (not duplicates) of the minority class.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>A is incorrect.</strong> Because the synthetic points are scattered everywhere (not concentrated at the borderline), this is plain SMOTE — not Borderline-SMOTE, which would focus on minority samples near the decision boundary.</p>
+  </div>
+</div>
+
+<!-- Soal 9 -->
+<div class="exercise" data-topic="imbalanced" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Cost-sensitive</span><span>UAS 2023/24 · Soal 9</span></div>
+  <h3>9. Balanced class weighting</h3>
+  <div class="ex-body">
+    <p>Confusion matrix (rows = actual, cols = predicted): Low → [102, 898], High → [48, 2]. Total $N = 1050$. The "High" class has $48 + 2 = 50$ samples; "Low" has 1000. What is the balanced weight for the "High risk" class?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> 0.525</li>
+    <li><span class="opt-letter">B.</span> 21</li>
+    <li><span class="opt-letter">C.</span> 10.5</li>
+    <li><span class="opt-letter">D.</span> 50</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Balanced weight formula: $w_k = \dfrac{N}{K \cdot n_k}$.</p>
+    $$w_{\text{High}} = \frac{1050}{2 \cdot 50} = \frac{1050}{100} = 10.5.$$
+    <p>Sanity-checking other options: accuracy is NOT a good metric on imbalanced data; total misclassification cost = $48 \cdot 25 + 898 = 2098$ (not 1200); F1 here is tiny (≈ 0.004), not 0.57.</p>
+  </div>
+</div>
+
+<!-- Soal 10 -->
+<div class="exercise" data-topic="cluster" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">K-Means</span><span>UAS 2023/24 · Soal 10</span></div>
+  <h3>10. K-Means with Manhattan distance</h3>
+  <div class="ex-body">
+    <p>Points: A1(2,10), A2(8,4), A3(1,2), A4(6,4), A5(4,9). Initial centroids: $C_1 = (2,10)$, $C_2 = (1,2)$. Use Manhattan distance. After the FIRST iteration, $C_1$ consists of which points?</p>
+  </div>
+  <ul class="options" data-correct="1">
+    <li><span class="opt-letter">A.</span> {A1, A2}</li>
+    <li><span class="opt-letter">B.</span> {A1, A5}</li>
+    <li><span class="opt-letter">C.</span> {A1, A4, A5}</li>
+    <li><span class="opt-letter">D.</span> {A1 only}</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Manhattan distances to $(C_1, C_2)$:</p>
+    <ul class="bullet">
+      <li>A1(2,10): (0, 9) → $C_1$ closer</li>
+      <li>A2(8,4): (12, 9) → $C_2$ closer</li>
+      <li>A3(1,2): (9, 0) → $C_2$ closer</li>
+      <li>A4(6,4): (10, 7) → $C_2$ closer</li>
+      <li>A5(4,9): (3, 10) → $C_1$ closer</li>
+    </ul>
+    <p>So in the first iteration: $C_1 = \{A1, A5\}$, $C_2 = \{A2, A3, A4\}$.</p>
+  </div>
+</div>
+
+<!-- Soal 11 -->
+<div class="exercise" data-topic="prob" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">Naive Bayes (mixed)</span><span>UAS 2023/24 · Soal 11</span></div>
+  <h3>11. Naive Bayes with categorical + Gaussian features</h3>
+  <div class="ex-body">
+    <p>Dataset of 16 rows: 7 cotton, 9 soybean. Predict crop for query <em>R</em>=high rainfall, <em>H</em>=low humidity, <em>T</em>=24°C. Conditional probabilities given:</p>
+    <ul class="bullet">
+      <li>$P(R=\text{high} \mid \text{cotton}) = 2/7 = 0.2857$; $P(R=\text{high} \mid \text{soy}) = 5/9 = 0.5556$.</li>
+      <li>$P(H=\text{low} \mid \text{cotton}) = 0.1000$ (after Laplace); $P(H=\text{low} \mid \text{soy}) = 0.2500$.</li>
+      <li>Gaussian on $T = 24$: $f_{\text{cotton}}(24) = 0.0676$; $f_{\text{soy}}(24) = 0.0316$.</li>
+    </ul>
+    <p>Which crop is more likely?</p>
+  </div>
+  <ul class="options" data-correct="1">
+    <li><span class="opt-letter">A.</span> Cotton</li>
+    <li><span class="opt-letter">B.</span> Soybean</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Class priors: $P(\text{cotton}) = 7/16 = 0.4375$; $P(\text{soy}) = 9/16 = 0.5625$.</p>
+    <p>Unnormalized posteriors:</p>
+    $$\text{cotton}: 0.4375 \times 0.2857 \times 0.1000 \times 0.0676 \approx 0.0008,$$
+    $$\text{soy}: 0.5625 \times 0.5556 \times 0.2500 \times 0.0316 \approx 0.0025.$$
+    <p>Since $0.0025 > 0.0008$, <strong>soybean</strong> is the more likely classification.</p>
+  </div>
+</div>
+
+<!-- Soal 12 -->
+<div class="exercise" data-topic="nn" data-set="part1">
+  <div class="ex-meta"><span class="topic-tag">MLP forward+back</span><span>UAS 2023/24 · Soal 12</span></div>
+  <h3>12. MLP forward & backward pass</h3>
+  <div class="ex-body">
+    <p>Architecture: $\mathbf{W}^{(1)}$ is $5 \times 4$, $\mathbf{W}^{(2)}$ is $3 \times 5$. From this:</p>
+    <ul class="bullet">
+      <li>Input features = ? Hidden units = ? Output units = ?</li>
+      <li>Task type?</li>
+      <li>If forward pass gives logits $\mathbf{z}^{(3)} = [1.306, 2.33, -0.68]$, what is $\mathbf{a}^{(3)} = \text{softmax}(\mathbf{z}^{(3)})$?</li>
+    </ul>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>Architecture:</strong> 4 inputs (cols of $\mathbf{W}^{(1)}$), 5 hidden units (rows of $\mathbf{W}^{(1)}$, cols of $\mathbf{W}^{(2)}$), 3 output units (rows of $\mathbf{W}^{(2)}$). Task: <strong>3-class classification</strong>.</p>
+    <p><strong>Softmax:</strong></p>
+    <ul class="bullet">
+      <li>$e^{1.306} \approx 3.691$, $e^{2.33} \approx 10.278$, $e^{-0.68} \approx 0.507$. Sum $\approx 14.476$.</li>
+      <li>$a_1^{(3)} \approx 3.691/14.476 = 0.255$</li>
+      <li>$a_2^{(3)} \approx 10.278/14.476 = 0.710$</li>
+      <li>$a_3^{(3)} \approx 0.507/14.476 = 0.035$</li>
+    </ul>
+    <p>Sums to 1.0 ✓. The most likely class is class 2.</p>
+    <p><strong>Backprop highlights</strong> (assuming softmax + CCE so $\boldsymbol\delta^{(3)} = \mathbf{a}^{(3)} - \mathbf{y}$):</p>
+    <ul class="bullet">
+      <li>$\partial J/\partial \mathbf{b}^{(2)} = \boldsymbol\delta^{(3)} = (-0.745, 0.71, 0.035)$ when target = class 1.</li>
+      <li>$\partial J/\partial w_{14}^{(2)} = \delta_1^{(3)} \cdot a_4^{(2)} = (-0.745)(0.72) = -0.536$.</li>
+      <li>$\delta_4^{(2)}$ via $(W^{(2)\top}\boldsymbol\delta^{(3)}) \odot \text{ReLU}'(\mathbf{z}^{(2)}) = -0.170$ for that element.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- PART II — UAS 2021 -->
+<!-- ============================================== -->
+<h2 id="part2" style="margin-top: 80px;">Part II — UAS KASDD 2021 (Isian / Fill-in)</h2>
+
+<!-- Soal 1 -->
+<div class="exercise" data-topic="prob" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">k-NN Regression</span><span>UAS 2021 · Soal 1</span></div>
+  <h3>1. k-NN regression — predicting speed</h3>
+  <div class="ex-body">
+    <p>Features: Age (normalized to $[0,1]$ with $\min = 22$, $\max = 38$) and Survived. Target (ID6) has Age = 25 → normalized = $0.1875$, Survived = 0. With $k = 3$ and Euclidean distance, the three closest neighbors have speeds 65, 85, 45. Predict speed for ID6.</p>
+  </div>
+  <ul class="options" data-correct="1">
+    <li><span class="opt-letter">A.</span> 75</li>
+    <li><span class="opt-letter">B.</span> 65</li>
+    <li><span class="opt-letter">C.</span> 55</li>
+    <li><span class="opt-letter">D.</span> 85</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>k-NN regression averages the neighbor targets:</p>
+    $$\hat y = \frac{65 + 85 + 45}{3} = \frac{195}{3} = 65.$$
+  </div>
+</div>
+
+<!-- Soal 2 -->
+<div class="exercise" data-topic="linear" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">Batch GD</span><span>UAS 2021 · Soal 2</span></div>
+  <h3>2. Linear regression — one epoch of batch GD</h3>
+  <div class="ex-body">
+    <p>Data: $(3,2), (7,17), (11,2), (15,17), (19,2), (23,17)$. Model $\hat y = w_0 + w_1 x$ with $w_0 = -1.75$, $w_1 = 1.25$, $\alpha = 0.01$, loss $L = \tfrac{1}{2}\sum (\hat y - y)^2$. After one full epoch of batch GD, find:</p>
+    <ul class="bullet">
+      <li>Initial loss $L$</li>
+      <li>New $w_0$ and $w_1$</li>
+    </ul>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <ol class="bullet">
+      <li>Predictions: $\hat y = -1.75 + 1.25x$ for $x = 3, 7, 11, 15, 19, 23$ gives $\hat y = 2, 7, 12, 17, 22, 27$.</li>
+      <li>Errors $(\hat y - y)$: $0, -10, 10, 0, 20, 10$.</li>
+      <li>$L = \tfrac{1}{2}(0 + 100 + 100 + 0 + 400 + 100) = \tfrac{1}{2}(700) = \boxed{350}$.</li>
+      <li>$\partial L/\partial w_0 = \sum \text{err} = 0 - 10 + 10 + 0 + 20 + 10 = 30$.</li>
+      <li>$\partial L/\partial w_1 = \sum \text{err} \cdot x = 0(3) + (-10)(7) + 10(11) + 0(15) + 20(19) + 10(23) = 0 - 70 + 110 + 0 + 380 + 230 = 650$.</li>
+      <li>Updates: $w_0 = -1.75 - 0.01(30) = \boxed{-2.05}$, $w_1 = 1.25 - 0.01(650) = \boxed{-5.25}$.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- Soal 3 -->
+<div class="exercise" data-topic="linear" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">SVM</span><span>UAS 2021 · Soal 3</span></div>
+  <h3>3. Hard-margin SVM — which point matters?</h3>
+  <div class="ex-body">
+    <p>You have a hard-margin linear SVM. Removing which type of point changes the decision boundary?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> Any data point in the dataset.</li>
+    <li><span class="opt-letter">B.</span> Only points far from the boundary.</li>
+    <li><span class="opt-letter">C.</span> Only support vectors (points on or closest to the margin).</li>
+    <li><span class="opt-letter">D.</span> Only points of the minority class.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Removing a point changes the boundary only if it's a <strong>support vector</strong> — a point on the margin. Non-SV points contribute zero to the SVM solution; deleting them changes nothing.</p>
+  </div>
+</div>
+
+<!-- Soal 4 -->
+<div class="exercise" data-topic="imbalanced" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">Evaluation</span><span>UAS 2021 · Soal 4</span></div>
+  <h3>4. Precision / Recall / F1</h3>
+  <div class="ex-body">
+    <p>Stratified 20% test split on 1000 samples (with 1000 positives total? Re-read: positive class has 1000 → test has 200 positives). FN = 100, FP = 150. Compute precision, recall, and F1.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <ol class="bullet">
+      <li>Test positives = 200, FN = 100 ⇒ TP = 200 − 100 = 100.</li>
+      <li>Precision = $\dfrac{TP}{TP + FP} = \dfrac{100}{100 + 150} = \dfrac{100}{250} = \boxed{0.40}$.</li>
+      <li>Recall = $\dfrac{TP}{TP + FN} = \dfrac{100}{200} = \boxed{0.50}$.</li>
+      <li>F1 = $\dfrac{2 \cdot 0.40 \cdot 0.50}{0.90} = \dfrac{0.40}{0.90} \approx \boxed{0.44}$.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- Soal 5 -->
+<div class="exercise" data-topic="prob" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">k-NN Classification</span><span>UAS 2021 · Soal 5</span></div>
+  <h3>5. k-NN accuracy</h3>
+  <div class="ex-body">
+    <p>k-NN with $k=3$ on 6 test points (leave-one-out). 5 of 6 are classified correctly. What is the accuracy?</p>
+  </div>
+  <ul class="options" data-correct="1">
+    <li><span class="opt-letter">A.</span> 80%</li>
+    <li><span class="opt-letter">B.</span> 83.33%</li>
+    <li><span class="opt-letter">C.</span> 66.67%</li>
+    <li><span class="opt-letter">D.</span> 100%</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Accuracy = $\dfrac{5}{6} \approx 0.8333 = 83.33\%$.</p>
+  </div>
+</div>
+
+<!-- Soal 6 -->
+<div class="exercise" data-topic="nn" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">MLP Forward</span><span>UAS 2021 · Soal 6</span></div>
+  <h3>6. Forward pass — ReLU activation</h3>
+  <div class="ex-body">
+    <p>Neuron with weights $w_{11} = 0.6, w_{12} = -0.5$, bias $b_1 = 0.1$, inputs $x_1 = 3$, $x_2 = 2$, ReLU activation. Find $a_1^{(2)}$.</p>
+  </div>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> 0.9</li>
+    <li><span class="opt-letter">B.</span> 0</li>
+    <li><span class="opt-letter">C.</span> 1.0</li>
+    <li><span class="opt-letter">D.</span> -0.9</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>$z_1^{(2)} = (0.6)(3) + (-0.5)(2) + 0.1 = 1.8 - 1 + 0.1 = 0.9$.</p>
+    <p>$a_1^{(2)} = \text{ReLU}(0.9) = 0.9$ (since $0.9 > 0$).</p>
+  </div>
+</div>
+
+<!-- Soal 7 -->
+<div class="exercise" data-topic="imbalanced" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">Imbalanced</span><span>UAS 2021 · Soal 7</span></div>
+  <h3>7. Misleading metric on imbalanced data</h3>
+  <div class="ex-body">
+    <p>A dataset has 99% negative class. A classifier always predicts negative. Which metric reports the misleadingly high "99%" success?</p>
+  </div>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> Accuracy</li>
+    <li><span class="opt-letter">B.</span> Recall (on positive class)</li>
+    <li><span class="opt-letter">C.</span> F1 score</li>
+    <li><span class="opt-letter">D.</span> Precision</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Accuracy = (TN + TP) / N. With everything predicted as negative, accuracy = 99% even though the model is useless. Recall, F1, and precision would all be 0 for the positive class.</p>
+  </div>
+</div>
+
+<!-- Soal 8 -->
+<div class="exercise" data-topic="linear" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">SVM Margin</span><span>UAS 2021 · Soal 8</span></div>
+  <h3>8. SVM margin from hyperplane</h3>
+  <div class="ex-body">
+    <p>Hyperplane $5x_1 + x_2 - 3 = 0$. So $\mathbf{w} = (5, 1)$. Compute the margin.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Margin = $\dfrac{2}{\|\mathbf{w}\|} = \dfrac{2}{\sqrt{5^2 + 1^2}} = \dfrac{2}{\sqrt{26}} \approx 0.392$.</p>
+  </div>
+</div>
+
+<!-- Soal 9 -->
+<div class="exercise" data-topic="nn" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">Backprop</span><span>UAS 2021 · Soal 9</span></div>
+  <h3>9. Backpropagation — hidden delta</h3>
+  <div class="ex-body">
+    <p>For hidden unit 1: $\delta_1^{(2)} = (w_{11}^{(2)} \delta_1^{(3)} + w_{21}^{(2)} \delta_2^{(3)}) \cdot f'(z_1^{(2)})$. Given: $\delta_1^{(3)} = 0.4, \delta_2^{(3)} = 0.2, w_{11}^{(2)} = 0.6, w_{21}^{(2)} = 0.7$. Also: $z_1^{(2)} = (0.4)(3) + (-0.5)(2) + 0.1 = 0.3 > 0$, ReLU activation. Find $\delta_1^{(2)}$.</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> 0.62</li>
+    <li><span class="opt-letter">B.</span> 0</li>
+    <li><span class="opt-letter">C.</span> 0.38</li>
+    <li><span class="opt-letter">D.</span> 0.42</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>$z_1^{(2)} = 0.3 > 0$, so ReLU$'(0.3) = 1$.</p>
+    $$\delta_1^{(2)} = (0.6 \cdot 0.4 + 0.7 \cdot 0.2) \cdot 1 = (0.24 + 0.14) = 0.38.$$
+  </div>
+</div>
+
+<!-- Soal 10 -->
+<div class="exercise" data-topic="imbalanced" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">SMOTE</span><span>UAS 2021 · Soal 10</span></div>
+  <h3>10. SMOTE neighbor selection</h3>
+  <div class="ex-body">
+    <p>SMOTE picks nearest neighbors of the <em>same class</em> to interpolate. For two minority (green) instances $a$ and $h$ with mixed-class surroundings, identify the valid SMOTE neighbors.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>SMOTE only interpolates between same-class neighbors.</p>
+    <ul class="bullet">
+      <li><strong>a) For instance $a$ (green):</strong> no same-class neighbor among b–h that qualifies as a valid SMOTE partner → <strong>0 candidates</strong>.</li>
+      <li><strong>b) For instance $h$ (green):</strong> the closest valid green neighbor is $c$ → <strong>partner = c</strong>.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- Soal 11 -->
+<div class="exercise" data-topic="imbalanced" data-set="part2">
+  <div class="ex-meta"><span class="topic-tag">Class weights</span><span>UAS 2021 · Soal 11</span></div>
+  <h3>11. Sklearn class_weight = 'balanced'</h3>
+  <div class="ex-body">
+    <p>$N = 20000$, $K = 3$ classes with $n_A = 15000, n_B = 4000, n_C = 1000$. Compute each class weight using $w_k = N / (K \cdot n_k)$.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <ul class="bullet">
+      <li>$w_A = 20000 / (3 \cdot 15000) = 20000/45000 \approx \mathbf{0.44}$.</li>
+      <li>$w_B = 20000 / (3 \cdot 4000) = 20000/12000 \approx \mathbf{1.67}$.</li>
+      <li>$w_C = 20000 / (3 \cdot 1000) = 20000/3000 \approx \mathbf{6.67}$.</li>
+    </ul>
+    <p>Minority classes get higher weights, forcing the model to pay more attention to them.</p>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- PART III — UAS 2021/22 Essay -->
+<!-- ============================================== -->
+<h2 id="part3" style="margin-top: 80px;">Part III — UAS KASDD 2021/2022 Essay</h2>
+
+<!-- Essay 1 -->
+<div class="exercise" data-topic="prob" data-set="part3">
+  <div class="ex-meta"><span class="topic-tag">k-NN + Jaccard</span><span>Essay 1</span></div>
+  <h3>E1. k-NN with Jaccard distance</h3>
+  <div class="ex-body">
+    <p>Binary features. Jaccard similarity $J = a/(a+b+c)$, distance $d = 1 - J$. Rama's profile = (game=1, film=0, fruit=1, vegetable=1). Distances to friends:</p>
+    <p>Andy 9/12, Budi 6/12, Caca 8/12, Didi 9/12, Eri 8/12, Fifi 6/12.</p>
+    <p>With $k = 3$, what is the predicted class?</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Two closest are Budi & Fifi (both 6/12). The third candidate is tied between Caca and Eri (both 8/12).</p>
+    <p><strong>Majority voting:</strong> Budi(Minus), Fifi(Tidak). The third vote breaks the tie:</p>
+    <ul class="bullet">
+      <li>If third = Caca(Minus) → prediction = <strong>Minus</strong>.</li>
+      <li>If third = Eri(Tidak) → prediction = <strong>Tidak</strong>.</li>
+    </ul>
+    <p>The answer depends on tie-breaking. Mention both possibilities in the exam.</p>
+  </div>
+</div>
+
+<!-- Essay 2 -->
+<div class="exercise" data-topic="linear" data-set="part3">
+  <div class="ex-meta"><span class="topic-tag">SVM Full</span><span>Essay 2</span></div>
+  <h3>E2. SVM — boundary, margin, classification, support vectors</h3>
+  <div class="ex-body">
+    <p>SVM with $\mathbf{w} = (2, 3)$, $b = -8$, and $\delta = 1$. Find:</p>
+    <ol class="bullet">
+      <li>Equations of $H_0, H_1, H_2$.</li>
+      <li>Margin.</li>
+      <li>Classify points $(2, 2)$ and $(2, 0)$.</li>
+      <li>Give an example support vector on each margin.</li>
+    </ol>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <ol class="bullet">
+      <li><strong>Boundaries:</strong> $H_0: 2x + 3y - 8 = 0$; $H_2: 2x + 3y - 8 = +1$; $H_1: 2x + 3y - 8 = -1$.</li>
+      <li><strong>Margin</strong> $= \dfrac{2}{\|\mathbf{w}\|} = \dfrac{2}{\sqrt{4+9}} = \dfrac{2}{\sqrt{13}} \approx 0.55$.</li>
+      <li><strong>Classification:</strong>
+        <ul class="bullet">
+          <li>$f(2,2) = 4 + 6 - 8 = +2 > 0$ → one class.</li>
+          <li>$f(2,0) = 4 + 0 - 8 = -4 < 0$ → other class.</li>
+        </ul>
+        Different signs → <strong>different classes</strong>.
+      </li>
+      <li><strong>Support vectors</strong> sit on $H_1$ or $H_2$. Example: $(3.5, 0)$ satisfies $2(3.5) + 3(0) - 8 = -1$ → on $H_1$. $(1.5, 2)$ satisfies $2(1.5) + 3(2) - 8 = +1$ → on $H_2$.</li>
+    </ol>
+  </div>
+</div>
+
+<!-- Essay 3 -->
+<div class="exercise" data-topic="linear" data-set="part3">
+  <div class="ex-meta"><span class="topic-tag">Logistic Regression</span><span>Essay 3</span></div>
+  <h3>E3. Logistic regression — predict + 1 GD ascent step</h3>
+  <div class="ex-body">
+    <p><strong>(a)</strong> Weights $\mathbf{w} = (0.1, 0.2, 0.3)$ (with bias), input $\mathbf{x} = (1, 70, 90)$. Compute $P(y=1 \mid \mathbf{x})$.</p>
+    <p><strong>(b)</strong> One gradient-ascent iteration for $w_1$ only, with $w_0 = 0, w_1 = 1, w_2 = -1$, $\alpha = 0.01$. Data: $(x_1, x_2, y) = (2,1,1), (0,4,0), (3,3,0), (3,1,1)$.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>(a)</strong> $z = 0.1 + 0.2(70) + 0.3(90) = 0.1 + 14 + 27 = 41.1$. $P(y=1) = 1/(1 + e^{-41.1}) \approx 1$. Pretty much certain.</p>
+    <p><strong>(b)</strong> Update rule: $w_1 \leftarrow w_1 + \alpha \sum_i (y_i - h(\mathbf{x}_i)) x_{1,i}$.</p>
+    <ul class="bullet">
+      <li>$(2,1, y=1)$: $z = 0 + 2 - 1 = 1$, $h = \sigma(1) = 0.731$, contribution = $(1 - 0.731)(2) = 0.537$.</li>
+      <li>$(0,4, y=0)$: $z = -4$, $h \approx 0.018$, contribution = $(0 - 0.018)(0) = 0$.</li>
+      <li>$(3,3, y=0)$: $z = 0$, $h = 0.5$, contribution = $(0 - 0.5)(3) = -1.5$.</li>
+      <li>$(3,1, y=1)$: $z = 2$, $h = 0.881$, contribution = $(1 - 0.881)(3) = 0.357$.</li>
+    </ul>
+    <p>$\partial \ell / \partial w_1 = 0.537 + 0 - 1.5 + 0.357 = -0.6045$.</p>
+    <p>New $w_1 = 1 + 0.01 \cdot (-0.6045) = \boxed{0.9939}$.</p>
+  </div>
+</div>
+
+<!-- Essay 4 -->
+<div class="exercise" data-topic="imbalanced" data-set="part3">
+  <div class="ex-meta"><span class="topic-tag">Imbalanced ML</span><span>Essay 4</span></div>
+  <h3>E4. Critique a bad imbalanced-classification pipeline</h3>
+  <div class="ex-body">
+    <p>A student applies SMOTE to the <em>entire dataset</em>, then trains and evaluates on the resulting data via plain cross-validation. ROC AUC = 0.95. Identify the two main mistakes.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <ol class="bullet">
+      <li><strong>Evaluating on synthetic data.</strong> SMOTE/oversampling should be applied <em>only on the training fold</em>, not on the test or whole dataset. Evaluating on oversampled data leaks information (synthetic test points may be interpolations of training points!) and gives misleadingly high scores. ROC AUC 0.95 is too optimistic.</li>
+      <li><strong>No stratified cross-validation.</strong> On imbalanced data, plain CV may produce folds with very few minority samples — or none at all. <em>Stratified</em> CV preserves class proportions per fold and is essential.</li>
+    </ol>
+    <p><strong>Fix:</strong> use the <code>imbalanced-learn</code> Pipeline that applies SMOTE inside each training fold only, combined with <code>StratifiedKFold</code>. Test on real (non-resampled) data.</p>
+  </div>
+</div>
+
+<!-- Essay 5 -->
+<div class="exercise" data-topic="nn" data-set="part3">
+  <div class="ex-meta"><span class="topic-tag">NN Loss + Backprop</span><span>Essay 5</span></div>
+  <h3>E5. Cross-entropy + hidden-layer backprop</h3>
+  <div class="ex-body">
+    <p><strong>(a)</strong> Softmax output $[0.7, 0.2, 0.1]$, target $[0, 0, 1]$. Compute CE loss.</p>
+    <p><strong>(b)</strong> Compute $\delta_2^{(2)}$. Given: $\delta_1^{(3)} = 0.3, \delta_2^{(3)} = 0.4$, $w_{12}^{(2)} = 0.6, w_{22}^{(2)} = 0.7$. The pre-activation $z_2^{(2)} = 0.4 x_1 + 0.1 x_2$ (ReLU).</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>(a)</strong> $L = -\sum t_k \log p_k = -(0 + 0 + 1 \cdot \log 0.1) = -\log(0.1) \approx 2.303$.</p>
+    <p><strong>(b)</strong> $\delta_2^{(2)} = (0.6 \cdot 0.3 + 0.7 \cdot 0.4) \cdot f'(z_2^{(2)}) = 0.46 \cdot f'(z_2^{(2)})$.</p>
+    <ul class="bullet">
+      <li>If $0.4 x_1 + 0.1 x_2 \geq 0$: ReLU$' = 1$ → $\delta_2^{(2)} = 0.46$.</li>
+      <li>If $0.4 x_1 + 0.1 x_2 < 0$: ReLU$' = 0$ → $\delta_2^{(2)} = 0$.</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- PART IV — UAS Gasal 2023 -->
+<!-- ============================================== -->
+<h2 id="part4" style="margin-top: 80px;">Part IV — UAS KASDD Gasal 2023 (Mostly MCQ)</h2>
+
+<div class="exercise" data-topic="prob" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">NB Bias-Variance</span><span>UAS 2023 · Soal 1</span></div>
+  <h3>1. Naive Bayes — bias vs variance</h3>
+  <div class="ex-body">
+    <p>True or False: "Naive Bayes has higher variance than bias."</p>
+  </div>
+  <ul class="options" data-correct="1">
+    <li><span class="opt-letter">A.</span> TRUE</li>
+    <li><span class="opt-letter">B.</span> FALSE</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>FALSE.</strong> Naive Bayes has <em>high bias</em> (due to the strong conditional independence assumption) and <em>low variance</em>. It's the opposite of the claim.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Regularization</span><span>UAS 2023 · Soal 2</span></div>
+  <h3>2. Which statement about L1/L2 is INCORRECT?</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> If $\lambda$ on L2 is very large, the model tends to overfit.</li>
+    <li><span class="opt-letter">B.</span> L1 produces sparsity by driving weights to zero.</li>
+    <li><span class="opt-letter">C.</span> L2 shrinks all weights toward zero.</li>
+    <li><span class="opt-letter">D.</span> Both L1 and L2 reduce overfitting.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>A is incorrect. Large $\lambda$ → small weights → simpler model → <strong>underfit</strong>, not overfit.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="imbalanced" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Imbalanced</span><span>UAS 2023 · Soal 3</span></div>
+  <h3>3. Imbalanced classification — which statement is wrong?</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> Accuracy is usually an appropriate metric for imbalanced classification.</li>
+    <li><span class="opt-letter">B.</span> F1 score balances precision and recall.</li>
+    <li><span class="opt-letter">C.</span> Oversampling can help mitigate class imbalance.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>A is wrong. On imbalanced data, accuracy is misleading because a trivial constant classifier can score very high. Use F1, ROC AUC, balanced accuracy, etc.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Logistic</span><span>UAS 2023 · Soal 4</span></div>
+  <h3>4. Logistic regression — taxonomy</h3>
+  <div class="ex-body">
+    <p>TRUE or FALSE: "Logistic regression is discriminative AND parametric."</p>
+  </div>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> TRUE</li>
+    <li><span class="opt-letter">B.</span> FALSE</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>TRUE. It models $P(y \mid \mathbf{x})$ directly (discriminative) with a fixed number of parameters $\mathbf{w}$ (parametric).</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="cluster" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Clustering</span><span>UAS 2023 · Soal 5</span></div>
+  <h3>5. K-Means vs agglomerative — incorrect claims</h3>
+  <div class="ex-body">
+    <p>Identify the INCORRECT statements about K-Means vs hierarchical agglomerative.</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> A given dataset can be clustered by either algorithm; the two are not mutually exclusive.</li>
+    <li><span class="opt-letter">B.</span> For $N \gg k$, k-means storage is larger than agglomerative.</li>
+    <li><span class="opt-letter">C.</span> For $N \gg k$, k-means storage $O(N)$ is smaller than agglomerative $O(N^2)$.</li>
+    <li><span class="opt-letter">D.</span> Only one of the two algorithms can handle a given dataset.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>B and D are incorrect.</strong> A is correct; C is the right comparison. K-Means storage $O(N)$ is smaller than agglomerative's $O(N^2)$ for large $N$.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Softmax dims</span><span>UAS 2023 · Soal 7</span></div>
+  <h3>7. Softmax regression — dimensions</h3>
+  <div class="ex-body">
+    <p>4 features, 3 classes. Which statement is INCORRECT?</p>
+  </div>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> $\mathbf{W}$ has dimensions $4 \times 3$.</li>
+    <li><span class="opt-letter">B.</span> Total parameters = $3 \times 4 + 3 = 15$.</li>
+    <li><span class="opt-letter">C.</span> Output is a 3-dim vector summing to 1.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>A is incorrect. Correct: $\mathbf{W} \in \mathbb{R}^{K \times D} = 3 \times 4$ (K classes as rows, D features as cols).</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="cluster" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">K-Means</span><span>UAS 2023 · Soal 8</span></div>
+  <h3>8. K-Means — what's NOT needed?</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> A distance metric to measure distance between clusters.</li>
+    <li><span class="opt-letter">B.</span> A distance metric to measure distance from a point to a centroid.</li>
+    <li><span class="opt-letter">C.</span> An initial number of clusters $k$.</li>
+    <li><span class="opt-letter">D.</span> A convergence criterion.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>A is not needed for K-Means. K-Means uses point-to-centroid distances (option B). Inter-cluster distances are needed for hierarchical clustering.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="cluster" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Dendrogram</span><span>UAS 2023 · Soal 9</span></div>
+  <h3>9. Cutting a dendrogram at ~50% similarity</h3>
+  <div class="ex-body">
+    <p>If we cut the dendrogram at similarity ~50%, three main branches result. How many clusters?</p>
+  </div>
+  <ul class="options" data-correct="1">
+    <li><span class="opt-letter">A.</span> 2</li>
+    <li><span class="opt-letter">B.</span> 3</li>
+    <li><span class="opt-letter">C.</span> 4</li>
+    <li><span class="opt-letter">D.</span> 5</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>The number of clusters = the number of vertical lines crossed when we draw the horizontal cut. Three branches → <strong>3 clusters</strong>.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="prob" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">NB params</span><span>UAS 2023 · Soal 10</span></div>
+  <h3>10. Naive Bayes parameter count</h3>
+  <div class="ex-body">
+    <p>3 classes × 1 feature with 4 categories. How many class-conditional probability parameters are there?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> 4</li>
+    <li><span class="opt-letter">B.</span> 7</li>
+    <li><span class="opt-letter">C.</span> 12</li>
+    <li><span class="opt-letter">D.</span> 3</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>$3 \times 4 = 12$ probabilities $P(\text{feature value} \mid \text{class})$.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="nn" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Activation</span><span>UAS 2023 · Soal 11</span></div>
+  <h3>11. Activation function — what does NOT depend on it?</h3>
+  <ul class="options" data-correct="3">
+    <li><span class="opt-letter">A.</span> Final accuracy.</li>
+    <li><span class="opt-letter">B.</span> Final learned weights/biases.</li>
+    <li><span class="opt-letter">C.</span> Number of iterations until convergence.</li>
+    <li><span class="opt-letter">D.</span> Number of data points used per epoch.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>The number of data points per epoch is determined by the dataset and batch size, not the activation function. A, B, C all depend on activation choice.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="cluster" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Evaluation</span><span>UAS 2023 · Soal 12</span></div>
+  <h3>12. Silhouette score — incorrect statement?</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> Silhouette only works for K-Means, not hierarchical clustering.</li>
+    <li><span class="opt-letter">B.</span> Silhouette $\in [-1, 1]$.</li>
+    <li><span class="opt-letter">C.</span> Higher silhouette = better separation.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>A is wrong. Silhouette is a general internal evaluation metric — it works for any clustering, including hierarchical.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="nn" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Forward</span><span>UAS 2023 · Soal 13</span></div>
+  <h3>13. Logistic activation neuron</h3>
+  <div class="ex-body">
+    <p>$z = 0.4 \cdot 0.1 + 0.2 \cdot 0.3 + 0.6 \cdot 0.5 = 0.04 + 0.06 + 0.30 = 0.4$. Logistic activation. Find $a_1^{(3)}$.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>$a_1^{(3)} = \sigma(0.4) = \dfrac{1}{1 + e^{-0.4}} \approx \dfrac{1}{1 + 0.670} \approx 0.599$.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="cluster" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Choosing k</span><span>UAS 2023 · Soal 14</span></div>
+  <h3>14. Pick k from silhouette plot</h3>
+  <div class="ex-body">
+    <p>Silhouette is highest at which $k$? (Hypothetical plot peaking at 3.)</p>
+  </div>
+  <ul class="options" data-correct="1">
+    <li><span class="opt-letter">A.</span> 2</li>
+    <li><span class="opt-letter">B.</span> 3</li>
+    <li><span class="opt-letter">C.</span> 4</li>
+    <li><span class="opt-letter">D.</span> 5</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Pick $k$ where silhouette peaks → $k = 3$. <strong>Difference from elbow:</strong> elbow uses SSE (lower better, look for bend); silhouette uses $S(C)$ (higher better, look for peak).</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="prob" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">MLE shift</span><span>UAS 2023 · Soal 15</span></div>
+  <h3>15. Likelihood peak shift</h3>
+  <div class="ex-body">
+    <p>From data $(0,0,1,1,1)$ the likelihood peak is at $\hat p = 3/5 = 0.6$. Now the data becomes $(0,0,0,0,1)$. The peak moves to:</p>
+  </div>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> The left ($\hat p = 0.2 < 0.6$).</li>
+    <li><span class="opt-letter">B.</span> The right ($\hat p > 0.6$).</li>
+    <li><span class="opt-letter">C.</span> Stays the same.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>$\hat p_{\text{MLE}} = k/n = 1/5 = 0.2 < 0.6$, so the peak moves to the <strong>left</strong>. The "shifts right" claim is incorrect.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="imbalanced" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">SBFS</span><span>UAS 2023 · Soal 16</span></div>
+  <h3>16. Sequential Backward Feature Selection</h3>
+  <div class="ex-body">
+    <p>Reducing from 12 features to 9 with SBFS requires evaluating which sets?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> 12 + 9 = 21 evaluations</li>
+    <li><span class="opt-letter">B.</span> 12 evaluations</li>
+    <li><span class="opt-letter">C.</span> 12 + 11 + 10 evaluations</li>
+    <li><span class="opt-letter">D.</span> 3 evaluations</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>SBFS removes one feature at a time. At each step it evaluates all candidates: 12 (initial round), then 11 (after removing one), then 10. Total = $12 + 11 + 10$.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="imbalanced" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Cost weights</span><span>UAS 2023 · Soal 17</span></div>
+  <h3>17. Inverse class distribution</h3>
+  <div class="ex-body">
+    <p>Class 0 has 200 of 10000 samples. What is the cost weight under inverse class distribution: $w = N/(K \cdot n_k)$?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> 50</li>
+    <li><span class="opt-letter">B.</span> 0.04</li>
+    <li><span class="opt-letter">C.</span> 25</li>
+    <li><span class="opt-letter">D.</span> 200</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>$w_0 = \dfrac{10000}{2 \cdot 200} = \dfrac{10000}{400} = 25$.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Logistic form</span><span>UAS 2023 · Soal 18</span></div>
+  <h3>18. Probability of infection — valid formulas</h3>
+  <div class="ex-body">
+    <p>Which expressions correctly give $P(y=1 \mid \mathbf{x})$?</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> $\dfrac{1}{1 + e^{-(w_0 + w_1 x_1 + w_2 x_2)}}$</li>
+    <li><span class="opt-letter">B.</span> $\sigma(\mathbf{w}^\top \mathbf{x} + b)$</li>
+    <li><span class="opt-letter">C.</span> $\mathbf{w}^\top \mathbf{x} + b$ (no sigmoid)</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Both A and B are correct (equivalent sigmoid expressions). C is wrong — without sigmoid, the output isn't a probability.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Linear algebra</span><span>UAS 2023 · Soal 20</span></div>
+  <h3>20. Feature selection — least appropriate</h3>
+  <div class="ex-body">
+    <p>$X_1$ and $X_2$ are correlated at 0.98. Which choice is LEAST appropriate?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> Drop one of $X_1$ and $X_2$ as redundant.</li>
+    <li><span class="opt-letter">B.</span> Use PCA to combine them.</li>
+    <li><span class="opt-letter">C.</span> Select both features.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Selecting both features is worst — they're nearly identical and provide no additional information. Drop one or combine via PCA.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Optimization</span><span>UAS 2023 · Soal 21</span></div>
+  <h3>21. Which model does NOT use Gradient Descent?</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> Decision Tree (CART)</li>
+    <li><span class="opt-letter">B.</span> Logistic regression</li>
+    <li><span class="opt-letter">C.</span> Neural network</li>
+    <li><span class="opt-letter">D.</span> Linear regression (when using GD)</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Decision trees are trained by <em>greedy splitting</em> using impurity measures (Gini, entropy), not gradient descent. The loss isn't even differentiable in the same sense.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Cross-entropy</span><span>UAS 2023 · Soal 22</span></div>
+  <h3>22. CE on Iris classification</h3>
+  <div class="ex-body">
+    <p>Target Virginica = $[0, 0, 1]$, softmax output $[0.2, 0.3, 0.5]$. CE loss?</p>
+  </div>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> $-\log(0.5) \approx 0.69$</li>
+    <li><span class="opt-letter">B.</span> $-\log(0.2)$</li>
+    <li><span class="opt-letter">C.</span> $-(0.2 + 0.3 + 0.5)$</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Only the third class has $t = 1$: $L = -\log(0.5) \approx 0.693$.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Softmax</span><span>UAS 2023 · Soal 23</span></div>
+  <h3>23. Why use softmax for output?</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> Outputs are in $[0, 1]$ and sum to 1 → interpretable as probabilities.</li>
+    <li><span class="opt-letter">B.</span> It's faster than sigmoid.</li>
+    <li><span class="opt-letter">C.</span> Outputs are independent.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Softmax naturally produces a probability distribution over $K$ classes. Crucially, outputs are <em>coupled</em> via the normalizer — not independent.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="imbalanced" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Imbalanced</span><span>UAS 2023 · Soal 24</span></div>
+  <h3>24. Imbalanced — which is correct?</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> Borderline-SMOTE is an extension of SMOTE that oversamples minority points near the decision boundary.</li>
+    <li><span class="opt-letter">B.</span> SMOTE makes identical copies of minority samples.</li>
+    <li><span class="opt-letter">C.</span> Undersampling duplicates minority samples.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>A is correct. B is wrong — SMOTE generates <em>synthetic</em> samples, not duplicates. C is wrong — undersampling <em>removes</em> majority samples; it doesn't duplicate the minority.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="prob" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Feature relevance</span><span>UAS 2023 · Soal 26</span></div>
+  <h3>26. Least relevant feature — lung cancer</h3>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> Smoking habits</li>
+    <li><span class="opt-letter">B.</span> Air pollution exposure</li>
+    <li><span class="opt-letter">C.</span> Sugar-sweetened drink intake</li>
+    <li><span class="opt-letter">D.</span> Chemical exposure</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>C — sugar-sweetened drink intake is least relevant for lung cancer. The other three are well-established lung-cancer risk factors.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="imbalanced" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Tomek links</span><span>UAS 2023 · Soal 27</span></div>
+  <h3>27. Tomek link — NOT a requirement</h3>
+  <div class="ex-body">
+    <p>Which is NOT a Tomek-link requirement for points P1 and P2?</p>
+  </div>
+  <ul class="options" data-correct="2">
+    <li><span class="opt-letter">A.</span> P1 and P2 are each other's nearest neighbors.</li>
+    <li><span class="opt-letter">B.</span> P1 and P2 are of different classes.</li>
+    <li><span class="opt-letter">C.</span> P1 and P2 belong to the same class.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>C contradicts B (Tomek links require <em>different</em> classes). So "P1 and P2 belong to the same class" is NOT a requirement — it's the opposite of one.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="linear" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">GD direction</span><span>UAS 2023 · Soal 28</span></div>
+  <h3>28. Gradient descent — inappropriate uses?</h3>
+  <div class="ex-body">
+    <p>For which goals is plain gradient descent NOT appropriate?</p>
+  </div>
+  <ul class="options" data-correct="-1">
+    <li><span class="opt-letter">A.</span> Maximize log-likelihood.</li>
+    <li><span class="opt-letter">B.</span> Minimize log-likelihood (this isn't even the right objective).</li>
+    <li><span class="opt-letter">C.</span> Minimize negative log-likelihood.</li>
+    <li><span class="opt-letter">D.</span> Minimize MSE.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p><strong>A and B are both inappropriate uses of plain GD.</strong> GD minimizes; to maximize log-likelihood, use gradient ascent (or equivalently, GD on NLL = option C). And minimizing log-likelihood is the wrong objective entirely (we usually want to maximize it).</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="imbalanced" data-set="part4">
+  <div class="ex-meta"><span class="topic-tag">Feature Selection</span><span>UAS 2023 · Soal 29</span></div>
+  <h3>29. Feature selection — most appropriate</h3>
+  <ul class="options" data-correct="0">
+    <li><span class="opt-letter">A.</span> SBFS to select 3 of 5 features → needs 2 iterations of removal.</li>
+    <li><span class="opt-letter">B.</span> PCA is a feature selection method.</li>
+    <li><span class="opt-letter">C.</span> chi-squared is for numeric-numeric correlation.</li>
+    <li><span class="opt-letter">D.</span> k-NN is an embedded feature selection method.</li>
+  </ul>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>A is correct. B is wrong — PCA is feature <em>extraction</em>, not selection. C is wrong — chi-squared is for categorical features. D is wrong — k-NN is a model, not a feature-selection method.</p>
+  </div>
+</div>
+
+<!-- ============================================== -->
+<!-- PART V — Clustering -->
+<!-- ============================================== -->
+<h2 id="part5" style="margin-top: 80px;">Part V — UAS Clustering Problems</h2>
+
+<div class="exercise" data-topic="cluster" data-set="part5">
+  <div class="ex-meta"><span class="topic-tag">K-Means update</span><span>Clustering · Soal 1</span></div>
+  <h3>1. K-Means centroid update</h3>
+  <div class="ex-body">
+    <p>Current clusters: $C_1 = \{P_2, P_5, P_6\}$ where $P_2 = (2,0,1)$, $P_5 = (-2,4,0)$, $P_6 = (0,2,2)$. Compute the next centroid of $C_1$.</p>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Centroid = element-wise mean:</p>
+    <ul class="bullet">
+      <li>$x$: $(2 + (-2) + 0)/3 = 0$</li>
+      <li>$y$: $(0 + 4 + 2)/3 = 2$</li>
+      <li>$z$: $(1 + 0 + 2)/3 = 1$</li>
+    </ul>
+    <p>New $C_1$ centroid = $\boxed{(0, 2, 1)}$.</p>
+  </div>
+</div>
+
+<div class="exercise" data-topic="cluster" data-set="part5">
+  <div class="ex-meta"><span class="topic-tag">Complete linkage</span><span>Clustering · Soal 2</span></div>
+  <h3>2. Agglomerative clustering — complete linkage</h3>
+  <div class="ex-body">
+    <p>After merging $A$ and $B$ into cluster $\{AB\}$, complete-linkage uses $d(\{AB\}, X) = \max(d(A,X), d(B,X))$. Given:</p>
+    <ul class="bullet">
+      <li>$d(A,C) = 0.51, d(B,C) = 0.25$ → $r$?</li>
+      <li>$d(A,D) = 0.84, d(B,D) = 0.16$ → $s$?</li>
+      <li>$d(A,E) = 0.28, d(B,E) = 0.77$ → $t$?</li>
+      <li>$d(A,F) = 0.38, d(B,F) = 0.61$ → $u$?</li>
+    </ul>
+  </div>
+  <button class="btn reveal">Show solution</button>
+  <div class="solution">
+    <span class="sol-label">Solution</span>
+    <p>Take the maximum each time:</p>
+    <ul class="bullet">
+      <li>$r = \max(0.51, 0.25) = \boxed{0.51}$</li>
+      <li>$s = \max(0.84, 0.16) = \boxed{0.84}$</li>
+      <li>$t = \max(0.28, 0.77) = \boxed{0.77}$</li>
+      <li>$u = \max(0.38, 0.61) = \boxed{0.61}$</li>
+    </ul>
+    <p>Continuing complete-linkage agglomerative produces the corresponding dendrogram (Figure 3 in the original exam).</p>
+  </div>
+</div>
+
+<div style="margin-top: 64px; padding: 28px; background: var(--paper-2); border-radius: 8px; text-align: center;">
+  <h3 style="margin-top: 0;">Done with the exercises?</h3>
+  <p>Review the formulas one more time before the exam.</p>
+  <a href="cheatsheet.html" style="background: var(--ink); color: var(--paper); padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">→ Open the cheatsheet</a>
+</div>
+
+</main>
+</div>
+
+<footer>
+  KASDD Notebook · 60+ problems · <a href="cheatsheet.html">Formula reference</a>
+</footer>
+
+</body>
+</html>

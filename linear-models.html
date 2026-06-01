@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Linear, Logistic &amp; Softmax — KASDD Notebook</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="main.js"></script>
+</head>
+<body class="linear">
+
+<nav class="topbar">
+  <a href="index.html" class="brand"><span class="mark">K</span> KASDD Notebook</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="probability.html">Probability</a></li>
+    <li><a href="linear-models.html">Linear Models</a></li>
+    <li><a href="clustering.html">Clustering</a></li>
+    <li><a href="neural-networks.html">Neural Networks</a></li>
+    <li><a href="exercises.html">Exercises</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+<aside class="sidebar">
+  <h4>On this page</h4>
+  <ul>
+    <li><a href="#setup">Supervised learning setup</a></li>
+    <li><a href="#decision">Master decision table</a></li>
+    <li><a href="#linear">Linear regression</a></li>
+    <li><a href="#normal">Normal equation</a></li>
+    <li><a href="#regular">L1 / L2 regularization</a></li>
+    <li><a href="#gd">Gradient descent</a></li>
+    <li><a href="#logistic">Logistic regression</a></li>
+    <li><a href="#softmax">Softmax regression</a></li>
+    <li><a href="#ovr">One-vs-Rest</a></li>
+  </ul>
+  <h4>Quick links</h4>
+  <ul>
+    <li><a href="exercises.html#linear">Practice problems</a></li>
+    <li><a href="cheatsheet.html#linear">Formula reference</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+
+<h1 class="page-title"><span class="accent-bar"></span>Linear models</h1>
+<p class="subtitle">Linear, logistic, and softmax regression — three faces of the same underlying machinery. One loss type per task, one gradient pattern for all.</p>
+
+<!-- ============= SETUP ============ -->
+<h2 id="setup">1. Supervised learning setup</h2>
+
+<p>A supervised dataset:</p>
+$$\mathcal{D} = \{(\mathbf{x}^{(1)}, y^{(1)}), \ldots, (\mathbf{x}^{(N)}, y^{(N)})\}.$$
+
+<div class="where">
+  <strong>Where:</strong> $N$ = number of training examples; $\mathbf{x}^{(i)}$ = feature vector of the $i$-th example (column vector in $\mathbb{R}^d$); $y^{(i)}$ = target/label; the superscript $(i)$ is an index, not a power.
+</div>
+
+<p>Goal: find a hypothesis $h: \mathcal{X} \to \mathcal{Y}$ that approximates an unknown function $f$. If $\mathcal{Y}$ is continuous → <strong>regression</strong>; if discrete → <strong>classification</strong>.</p>
+
+<!-- ============= DECISION TABLE ============ -->
+<h2 id="decision">2. Master decision table — which model, loss, activation?</h2>
+
+<p>This single table tells you everything. Pick the row matching your problem.</p>
+
+<table class="data">
+  <thead>
+    <tr>
+      <th>Task</th>
+      <th>Model</th>
+      <th>Output activation</th>
+      <th>Loss function</th>
+      <th>Target shape</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td><strong>Regression</strong> (continuous)</td>
+      <td>Linear regression</td>
+      <td>Identity (linear)</td>
+      <td>SSE / MSE</td>
+      <td>$y \in \mathbb{R}$</td>
+    </tr>
+    <tr>
+      <td><strong>Binary classification</strong></td>
+      <td>Logistic regression</td>
+      <td>Sigmoid</td>
+      <td>Binary Cross Entropy</td>
+      <td>$y \in \{0,1\}$</td>
+    </tr>
+    <tr>
+      <td><strong>Multi-class</strong> (exactly one class)</td>
+      <td>Softmax regression</td>
+      <td>Softmax</td>
+      <td>Categorical Cross Entropy</td>
+      <td>$\mathbf{y} \in \{0,1\}^K$ one-hot</td>
+    </tr>
+    <tr>
+      <td><strong>Multi-label</strong> (multiple classes possible)</td>
+      <td>$K$ logistic regressions</td>
+      <td>Sigmoid (each)</td>
+      <td>Sum of $K$ BCEs</td>
+      <td>$\mathbf{y} \in \{0,1\}^K$ (not one-hot)</td>
+    </tr>
+    <tr>
+      <td><strong>Multi-class via OVR</strong></td>
+      <td>$K$ binary logistic models</td>
+      <td>Sigmoid (each)</td>
+      <td>BCE per model</td>
+      <td>$y \in \{1,\ldots,K\}$</td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="box yellow">
+  <span class="box-label">Quick decision guide</span>
+  <ul class="bullet">
+    <li>Output is a <strong>number</strong> (price, points, time) → Linear regression.</li>
+    <li>Output is <strong>yes/no</strong>, spam/not, win/lose → Logistic regression.</li>
+    <li>Output is <strong>exactly one of $K$</strong> categories (digit recognition, player position) → Softmax.</li>
+    <li>Output can be <strong>multiple categories at once</strong> (movie genres, image tags) → Multi-label sigmoid.</li>
+    <li>Already have a logistic library and need multi-class? → OVR ($K$ binary models).</li>
+  </ul>
+</div>
+
+<!-- ============= LINEAR ============ -->
+<h2 id="linear">3. Linear regression</h2>
+
+<p>With the trick $x_0 = 1$ so the bias is absorbed into the weight vector:</p>
+
+<div class="box gray">
+  <span class="box-label">Hypothesis</span>
+  $$h_{\mathbf{w}}(\mathbf{x}) = w_0 + w_1 x_1 + \cdots + w_d x_d = \sum_{i=0}^{d} w_i x_i = \mathbf{w}^\top \mathbf{x}.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $\mathbf{x} = (x_0, x_1, \ldots, x_d)^\top$ with $x_0 = 1$ so the bias is just another weight; $\mathbf{w}$ = weight vector; $w_0$ = bias/intercept; $d$ = number of original features.
+</div>
+
+<p>It's called linear because it's linear <em>in the weights $w_i$</em>, not in the features $x_i$. (You can use polynomial features and still have a "linear model".)</p>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA — predicting points per game</span>
+  <p><strong>Features:</strong> $x_1$ = minutes played, $x_2$ = field goal attempts (FGA), $x_3$ = free throw attempts (FTA).</p>
+  <p>After training: $\hat{\mathbf{w}} = (1.2, 0.3, 1.1, 0.88)$.</p>
+  <p>For a player who played 36 minutes with 20 FGA and 5 FTA:</p>
+  $$\hat y = 1.2 + (0.3)(36) + (1.1)(20) + (0.88)(5) = 1.2 + 10.8 + 22.0 + 4.4 = 38.4 \text{ points}.$$
+  <p>Each additional FGA raises expected points by 1.1.</p>
+</div>
+
+<h3>Loss function (SSE / MSE)</h3>
+
+<div class="box gray">
+  <span class="box-label">Sum of Squared Errors</span>
+  $$L(\mathbf{w}) = \frac{1}{2}\sum_{i=1}^{N}\left(h_{\mathbf{w}}(\mathbf{x}^{(i)}) - y^{(i)}\right)^2.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $h_{\mathbf{w}}(\mathbf{x}^{(i)}) - y^{(i)}$ = residual; we square so signs don't cancel and big errors get penalized more; the $\tfrac{1}{2}$ is for derivative neatness. MSE = $\tfrac{1}{N}$ × SSE.
+</div>
+
+<!-- ============= NORMAL EQ ============ -->
+<h2 id="normal">4. The normal equation</h2>
+
+<p>Stack the design matrix $\mathbf{X}$ (each row = one example) and target vector $\mathbf{y}$:</p>
+
+$$L(\mathbf{w}) = \tfrac{1}{2}\mathbf{r}^\top\mathbf{r}, \quad \mathbf{r} = \mathbf{X}\mathbf{w} - \mathbf{y}, \quad \nabla_{\mathbf{w}} L = (\mathbf{X}\mathbf{w} - \mathbf{y})^\top \mathbf{X}.$$
+
+<p>Setting the gradient to zero gives the closed-form solution:</p>
+
+<div class="box gray">
+  <span class="box-label">Normal equation</span>
+  $$\boxed{\;\mathbf{w}^{*} = (\mathbf{X}^\top \mathbf{X})^{-1}\mathbf{X}^\top\mathbf{y}\;}$$
+</div>
+
+<h3>Worked example</h3>
+
+<p>Data $(x, y)$: $(1, 2), (2, 2), (3, 4)$. With $x_0 = 1$ prepended:</p>
+
+$$\mathbf{X} = \begin{pmatrix} 1 & 1 \\ 1 & 2 \\ 1 & 3 \end{pmatrix}, \quad \mathbf{y} = \begin{pmatrix} 2 \\ 2 \\ 4 \end{pmatrix}, \quad \mathbf{X}^\top\mathbf{X} = \begin{pmatrix} 3 & 6 \\ 6 & 14 \end{pmatrix}, \quad \mathbf{X}^\top\mathbf{y} = \begin{pmatrix} 8 \\ 18 \end{pmatrix}.$$
+
+<p>Determinant: $3 \cdot 14 - 6 \cdot 6 = 6$, so $(\mathbf{X}^\top\mathbf{X})^{-1} = \tfrac{1}{6}\begin{pmatrix} 14 & -6 \\ -6 & 3 \end{pmatrix}$. Then:</p>
+
+$$\mathbf{w}^{*} = \tfrac{1}{6}\begin{pmatrix} 14 \cdot 8 - 6 \cdot 18 \\ -6 \cdot 8 + 3 \cdot 18 \end{pmatrix} = \tfrac{1}{6}\begin{pmatrix} 4 \\ 6 \end{pmatrix} = \begin{pmatrix} 0.667 \\ 1 \end{pmatrix}.$$
+
+<p>So $h(x) = 0.667 + x$. Residuals $(-0.333, 0.667, -0.333)$, SSE $\approx 0.333$.</p>
+
+<!-- ============= REGULARIZATION ============ -->
+<h2 id="regular">5. Regularization — L1 (Lasso) &amp; L2 (Ridge)</h2>
+
+<p><strong>Motivation:</strong> linear models with many features overfit by tying themselves to noise. <strong>Solution:</strong> add a penalty on the size of the weights.</p>
+
+<div class="box gray">
+  <span class="box-label">Regularized loss</span>
+  $$J(\mathbf{w}) = \underbrace{\frac{1}{2N}\sum_{i=1}^{N}\left(h_{\mathbf{w}}(\mathbf{x}^{(i)}) - y^{(i)}\right)^2}_{\text{MSE}} + \underbrace{\lambda \cdot \Omega(\mathbf{w})}_{\text{regularization}}.$$
+</div>
+
+<div class="decision-grid">
+  <div class="decision-row">
+    <div class="label">L1 — Lasso</div>
+    <div class="value">$\Omega(\mathbf{w}) = \|\mathbf{w}\|_1 = \sum_j |w_j|$</div>
+  </div>
+  <div class="decision-row">
+    <div class="label">L2 — Ridge</div>
+    <div class="value">$\Omega(\mathbf{w}) = \|\mathbf{w}\|_2^2 = \sum_j w_j^2 = \mathbf{w}^\top\mathbf{w}$</div>
+  </div>
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Key properties (exam favorites)</span>
+  <ul class="bullet">
+    <li>If $\lambda = 0$ → $J(\mathbf{w})$ is <strong>not</strong> regularized (reduces to plain MSE).</li>
+    <li>If $\lambda$ is very large on L2 → the model <strong>underfits</strong> (not overfits). Weights forced toward 0, model too simple.</li>
+    <li><strong>L1 induces feature selection</strong> — some $w_j$ become exactly 0, dropping those features entirely.</li>
+    <li><strong>L2 shrinks all weights</strong> toward 0 but rarely makes them exactly zero.</li>
+  </ul>
+</div>
+
+<table class="data">
+  <thead><tr><th>Goal</th><th>Choice</th><th>Reason</th></tr></thead>
+  <tbody>
+    <tr><td>Feature selection</td><td>L1 (Lasso)</td><td>Forces weights to zero</td></tr>
+    <tr><td>Stability</td><td>L2 (Ridge)</td><td>Shrinks all weights</td></tr>
+    <tr><td>General overfit prevention</td><td>L2</td><td>Smoother, more convex</td></tr>
+  </tbody>
+</table>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA — feature selection with Lasso</span>
+  <p>Predict MVP score from 30 features (PPG, RPG, APG, FG%, 3P%, FT%, BPG, SPG, TOV, Win%, …). Apply Lasso with $\lambda = 0.1$.</p>
+  <p>After training, only ~6 features end up with $w_j \neq 0$ (PPG, RPG, APG, FG%, Win%, BPG). The other 24 are dropped automatically. With Ridge, all 30 keep small nonzero weights — useful when you believe every statistic contributes a little.</p>
+</div>
+
+<h3>Fitting curve — under/overfit visualized</h3>
+<p style="font-family: var(--mono); font-size: 14px; text-align: center; margin: 18px 0;">
+  Underfitting ←— Good fit —→ Overfitting
+</p>
+<ul class="bullet">
+  <li><strong>Underfitting:</strong> model too simple (e.g., $M = 1$ polynomial). High bias, fails to capture pattern.</li>
+  <li><strong>Overfitting:</strong> model too flexible (e.g., $M = 9$ on 10 data points). High variance, fits noise.</li>
+</ul>
+<p>Connection to regularization: large $\lambda$ → simpler model → toward underfit. Small $\lambda$ → more flexible → toward overfit. Pick $\lambda$ via a validation set.</p>
+
+<!-- ============= GD ============ -->
+<h2 id="gd">6. Gradient descent</h2>
+
+<div class="box gray">
+  <span class="box-label">Update rule (all linear models)</span>
+  $$\mathbf{w} := \mathbf{w} - \alpha \, (\nabla_{\mathbf{w}} L(\mathbf{w}))^\top.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $\alpha$ = learning rate (small positive, e.g. 0.01); $\nabla_{\mathbf{w}}L$ = gradient (direction of steepest <em>increase</em>); we move opposite. Transpose because $\nabla L$ comes out as a row vector while $\mathbf{w}$ is a column.
+</div>
+
+<h3>The universal gradient pattern</h3>
+
+<div class="box blue">
+  <span class="box-label">For ALL linear models</span>
+  $$\nabla_{\mathbf{w}} L = \sum_i (\text{prediction}^{(i)} - \text{target}^{(i)}) \cdot \mathbf{x}^{(i)\top}.$$
+  <p>Only the meaning of "prediction" changes:</p>
+  <ul class="bullet">
+    <li><strong>Linear regression:</strong> $\nabla_{\mathbf{w}} L = (\mathbf{X}\mathbf{w} - \mathbf{y})^\top \mathbf{X}$</li>
+    <li><strong>Logistic regression:</strong> $\nabla_{\mathbf{w}} L = (\text{Sig}(\mathbf{X}\mathbf{w}) - \mathbf{y})^\top \mathbf{X}$</li>
+    <li><strong>Softmax regression:</strong> $\dfrac{\partial L}{\partial \mathbf{W}} = \sum_i (\mathbf{s}^{(i)} - \mathbf{y}^{(i)})\mathbf{x}^{(i)\top}$</li>
+  </ul>
+  <p>With L2: add $2\lambda\mathbf{w}$ to the gradient. With L1: add $\lambda\,\text{sign}(\mathbf{w})$.</p>
+</div>
+
+<h3>Variants</h3>
+<table class="data">
+  <thead><tr><th>Variant</th><th>Updates</th><th>Properties</th></tr></thead>
+  <tbody>
+    <tr><td>Batch GD</td><td>1 update after scanning all $N$ examples</td><td>Accurate gradient, slow</td></tr>
+    <tr><td>Stochastic GD (SGD)</td><td>1 update per example</td><td>Fast & noisy; noise can escape local minima</td></tr>
+    <tr><td>Minibatch GD</td><td>1 update per ~10–20 examples</td><td>Best compromise — what's used in practice</td></tr>
+  </tbody>
+</table>
+
+<h3>Stopping criteria</h3>
+<ul class="bullet">
+  <li>Fixed number of iterations.</li>
+  <li>$\|\mathbf{w}' - \mathbf{w}\| \leq \varepsilon$ — small weight change.</li>
+  <li>$|L(\mathbf{w}') - L(\mathbf{w})| \leq \varepsilon$ — small loss change.</li>
+  <li>$\|\nabla L(\mathbf{w})\| \leq \varepsilon$ — gradient near zero.</li>
+</ul>
+
+<div class="box yellow">
+  <span class="box-label">Tutorial — stopping criterion</span>
+  <p>For $\mathbf{w} = (w_0, w_1, w_2)^\top$, a valid criterion is:</p>
+  $$(w_0^{(k+1)} - w_0^{(k)})^2 + (w_1^{(k+1)} - w_1^{(k)})^2 + (w_2^{(k+1)} - w_2^{(k)})^2 \leq \varepsilon^2,$$
+  <p>i.e., $\|\mathbf{w}^{(k+1)} - \mathbf{w}^{(k)}\|_2^2 \leq \varepsilon^2$.</p>
+</div>
+
+<h3>Worked example — GD on $L(w) = w^2 - 3w + 1$</h3>
+
+<p>$L'(w) = 2w - 3$, minimum at $w^* = 1.5$. Start $w_0 = 0$, $\alpha = 0.1$:</p>
+
+<table class="data">
+  <thead><tr><th>Iter</th><th>$w$</th><th>$L'(w)$</th><th>$w - \alpha L'(w)$</th></tr></thead>
+  <tbody>
+    <tr><td>0</td><td>0</td><td>−3</td><td>0.3</td></tr>
+    <tr><td>1</td><td>0.3</td><td>−2.4</td><td>0.54</td></tr>
+    <tr><td>2</td><td>0.54</td><td>−1.92</td><td>0.732</td></tr>
+    <tr><td>3</td><td>0.732</td><td>−1.536</td><td>0.886</td></tr>
+  </tbody>
+</table>
+<p>$w$ converges toward 1.5.</p>
+
+<!-- ============= LOGISTIC ============ -->
+<h2 id="logistic">7. Logistic regression</h2>
+
+<h3>The sigmoid function</h3>
+
+<div class="box gray">
+  <span class="box-label">Sigmoid</span>
+  $$g(z) = \text{Sig}(z) = \frac{1}{1 + e^{-z}} = \frac{e^z}{e^z + 1}.$$
+</div>
+
+<p>Properties:</p>
+<ul class="bullet">
+  <li>$0 < \text{Sig}(z) < 1$ — maps any real to a probability.</li>
+  <li>$\text{Sig}(-z) = 1 - \text{Sig}(z)$.</li>
+  <li>$\text{Sig}'(z) = \text{Sig}(z)(1 - \text{Sig}(z))$ — the clean derivative that makes backprop nice.</li>
+</ul>
+
+<h3>Model &amp; decision boundary</h3>
+
+<div class="box gray">
+  <span class="box-label">Logistic regression model</span>
+  $$h_{\mathbf{w}}(\mathbf{x}) = \text{Sig}(\mathbf{w}^\top\mathbf{x}), \qquad \log\frac{p}{1-p} = \mathbf{w}^\top\mathbf{x} \text{ (linear log-odds)}.$$
+</div>
+
+<p>Decision rule: predict class 1 if $h \geq 0.5$, else class 0 (equivalent to $\mathbf{w}^\top\mathbf{x} \geq 0$).</p>
+
+<h3>Binary cross entropy (BCE)</h3>
+
+<div class="box gray">
+  <span class="box-label">BCE loss</span>
+  $$\text{NLL}(\mathbf{w}) = -\sum_{i=1}^{M}\left[y^{(i)}\log h_{\mathbf{w}}(\mathbf{x}^{(i)}) + (1-y^{(i)})\log(1 - h_{\mathbf{w}}(\mathbf{x}^{(i)}))\right].$$
+</div>
+
+<p>When $y^{(i)} = 1$ only the left term contributes; when $y^{(i)} = 0$ only the right term. Minimizing NLL = maximizing log-likelihood under a Bernoulli model.</p>
+
+<div class="box blue">
+  <span class="box-label">Gradient ascent vs descent — same answer</span>
+  <p><strong>Ascent</strong> (maximize log-likelihood $\ell$):</p>
+  $$w_j := w_j + \alpha \sum_{i=1}^{m}(y^{(i)} - h_{\mathbf{w}}(\mathbf{x}^{(i)}))x_j^{(i)}.$$
+  <p><strong>Descent</strong> (minimize NLL):</p>
+  $$w_j := w_j - \alpha \sum_{i=1}^{m}(h_{\mathbf{w}}(\mathbf{x}^{(i)}) - y^{(i)})x_j^{(i)}.$$
+  <p>Both produce the same update; the ± signs cancel. <strong>What is NOT correct:</strong> a single-example update without the $\sum_{i=1}^{m}$ when doing batch GD.</p>
+</div>
+
+<p>Note: there is <strong>no closed-form solution</strong> for logistic regression because of the nonlinear sigmoid — must use GD.</p>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA — clutch shot success</span>
+  <p>Features: $x_1$ = distance to rim (ft); $x_2$ = time remaining (sec); $x_3$ = defender distance (ft).</p>
+  <p>Trained: $\hat{\mathbf{w}} = (2.0, -0.1, 0.05, 0.3)$. Damian Lillard shoots from $x_1 = 28$, $x_2 = 4$, $x_3 = 5$.</p>
+  <p><strong>Step 1 — compute the logit:</strong></p>
+  $$z = 2.0 + (-0.1)(28) + (0.05)(4) + (0.3)(5) = 0.9.$$
+  <p><strong>Step 2 — apply sigmoid:</strong></p>
+  $$P(\text{Make}) = \text{Sig}(0.9) = \frac{1}{1 + e^{-0.9}} \approx 0.711.$$
+  <p>71.1% make probability — Dame Time! 🔥</p>
+</div>
+
+<h3>Worked example — forward + one GD step</h3>
+
+<p>$\mathbf{x} = (1, 2)^\top$ (with $x_0 = 1$), $\mathbf{w} = (-1, 0.8)^\top$, $y = 1$, $\alpha = 0.1$.</p>
+
+$$z = \mathbf{w}^\top\mathbf{x} = (-1)(1) + (0.8)(2) = 0.6,$$
+$$h = \text{Sig}(0.6) = \frac{1}{1 + 0.5488} = 0.6457,$$
+$$\text{BCE} = -\log(0.6457) = 0.4373,$$
+$$(h - y)\mathbf{x} = (0.6457 - 1)(1, 2) = (-0.3543, -0.7086),$$
+$$\mathbf{w}_{\text{new}} = \mathbf{w} - \alpha(h-y)\mathbf{x} = (-0.9646, 0.8709).$$
+
+<!-- ============= SOFTMAX ============ -->
+<h2 id="softmax">8. Softmax regression (multinomial logistic)</h2>
+
+<div class="box gray">
+  <span class="box-label">Softmax</span>
+  $$P(y\!=\!k \mid \mathbf{x}) = \text{softmax}_k(\mathbf{W}\mathbf{x}) = \frac{\exp(\mathbf{w}_k^\top \mathbf{x})}{\sum_{\ell=1}^{K} \exp(\mathbf{w}_\ell^\top\mathbf{x})}.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $K$ = number of classes; $\mathbf{w}_k$ = weight vector for class $k$; $\mathbf{W}$ = matrix whose rows are $\mathbf{w}_1^\top, \ldots, \mathbf{w}_K^\top$. The denominator normalizes so probabilities sum to 1.
+</div>
+
+<p>Output:</p>
+$$\mathbf{h}_{\mathbf{W}}(\mathbf{x}) = \text{softmax}(\mathbf{W}\mathbf{x}) = \begin{pmatrix} P(y\!=\!1 \mid \mathbf{x}) \\ \vdots \\ P(y\!=\!K \mid \mathbf{x}) \end{pmatrix} \in \mathbb{R}^K.$$
+
+<p>A vector of $K$ probabilities summing to 1.</p>
+
+<h3>Categorical cross entropy (CCE)</h3>
+
+<div class="box gray">
+  <span class="box-label">CCE loss</span>
+  $$\text{NLL}(\mathbf{W}) = -\sum_{i=1}^{N}\sum_{k=1}^{K} y_k^{(i)} \log \text{softmax}_k(\mathbf{W}\mathbf{x}^{(i)}) = -\sum_i \mathbf{y}^{(i)\top}\log\,\text{softmax}(\mathbf{W}\mathbf{x}^{(i)}).$$
+</div>
+
+<p>Gradient (very compact):</p>
+$$\frac{\partial L}{\partial \mathbf{W}} = \sum_i (\mathbf{s}^{(i)} - \mathbf{y}^{(i)})\mathbf{x}^{(i)\top},$$
+<p>where $\mathbf{s}^{(i)} = \text{softmax}(\mathbf{W}\mathbf{x}^{(i)})$ is the predicted probability vector.</p>
+
+<div class="box yellow">
+  <span class="box-label">Softmax parameter dimensions — frequently confused!</span>
+  <p>For $K$-class classification with input of $D$ features (bias separate):</p>
+  $$\underbrace{(K \times 1)}_{\text{output}} = \underbrace{(K \times D)}_{\mathbf{W}} \cdot \underbrace{(D \times 1)}_{\mathbf{x}} + \underbrace{(K \times 1)}_{\mathbf{b}}.$$
+  <p>So $\mathbf{W}$ has dimension $K \times D$ — <strong>NOT</strong> $D \times K$! Total parameters: $K \cdot D + K = K(D+1)$.</p>
+  <p><strong>Example:</strong> 3-class with 4 features → $\mathbf{W} \in \mathbb{R}^{3 \times 4}$, $\mathbf{b} \in \mathbb{R}^3$, total = $3 \cdot 4 + 3 = 15$.</p>
+</div>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA — predicting player position</span>
+  <p>5 classes (PG/SG/SF/PF/C), 5 features (height, weight, RPG, APG, BPG). Parameter shapes: $\mathbf{W} \in \mathbb{R}^{5\times 5}$, $\mathbf{b} \in \mathbb{R}^5$. Total = $5 \cdot 5 + 5 = 30$.</p>
+  <p>For Nikola Jokić, suppose the logits computed are $\mathbf{W}\mathbf{x} + \mathbf{b} = (1.2, 0.8, 1.1, 3.5, 4.2)$. Then:</p>
+  $$\mathbf{s} = \frac{1}{e^{1.2} + e^{0.8} + e^{1.1} + e^{3.5} + e^{4.2}}\left(e^{1.2}, e^{0.8}, e^{1.1}, e^{3.5}, e^{4.2}\right) \approx (0.02, 0.01, 0.02, 0.23, 0.72).$$
+  <p>Most likely position: <strong>Center (72%)</strong> — matches reality.</p>
+</div>
+
+<!-- ============= OVR ============ -->
+<h2 id="ovr">9. One-vs-Rest (OVR) vs Softmax</h2>
+
+<div class="decision-grid">
+  <div class="decision-row">
+    <div class="label">One-vs-Rest</div>
+    <div class="value">Train $K$ binary classifiers (each: class $k$ vs the rest). Each has its own independent loss.</div>
+  </div>
+  <div class="decision-row">
+    <div class="label">Softmax</div>
+    <div class="value">A single model with $K$ output units. One CCE loss for everything.</div>
+  </div>
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Tutorial — OVR vs Softmax true/false</span>
+  <ul class="bullet">
+    <li>"5-class OVR needs 4 logistic regressions" → <strong>FALSE</strong>. Needs $K = 5$ binary classifiers.</li>
+    <li>"Each logistic in OVR has an independent loss" → <strong>TRUE</strong>.</li>
+    <li>"Softmax optimizes a single log-likelihood" → <strong>TRUE</strong>.</li>
+    <li>"Softmax output is always in $[0,1]$" → <strong>TRUE</strong> (in fact in $(0,1)$, and sums to 1).</li>
+  </ul>
+  <p>Note: OVR is not always better than softmax. Softmax is more <em>consistent</em> because it models all class probabilities jointly.</p>
+</div>
+
+<h3>Worked example — softmax NLL</h3>
+
+<p>$\mathbf{x} = (1, 0.8, 0.8)^\top$, target $\mathbf{y} = (1, 0, 0)$, $\mathbf{W} = \begin{pmatrix} 0.3 & 0.9 & 0.8 \\ 0.8 & 0.6 & 0.6 \\ 0.3 & 0.4 & 0.9 \end{pmatrix}$.</p>
+
+<p>Logits: $\mathbf{W}\mathbf{x} = (1.66, 1.76, 1.34)$. Exponentials: $(5.259, 5.812, 3.819)$, sum $14.890$. Softmax: $\mathbf{s} = (0.35, 0.39, 0.26)$. NLL: $-\log(0.35) \approx 1.05$.</p>
+
+<div style="margin-top: 48px; padding: 24px; background: var(--paper-2); border-radius: 6px; text-align: center;">
+  <p style="font-family: var(--serif); font-size: 18px; color: var(--ink); margin-bottom: 8px;">Next:</p>
+  <a href="clustering.html" class="btn" style="background: var(--accent-cluster); color: var(--paper); padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">→ Clustering &amp; Silhouette</a>
+</div>
+
+</main>
+</div>
+
+<footer>
+  KASDD Notebook · <a href="exercises.html#linear">Practice this topic</a> · <a href="cheatsheet.html">All formulas</a>
+</footer>
+
+</body>
+</html>

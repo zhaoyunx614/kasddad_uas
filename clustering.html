@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Clustering — KASDD Notebook</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="main.js"></script>
+</head>
+<body class="cluster">
+
+<nav class="topbar">
+  <a href="index.html" class="brand"><span class="mark">K</span> KASDD Notebook</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="probability.html">Probability</a></li>
+    <li><a href="linear-models.html">Linear Models</a></li>
+    <li><a href="clustering.html">Clustering</a></li>
+    <li><a href="neural-networks.html">Neural Networks</a></li>
+    <li><a href="exercises.html">Exercises</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+<aside class="sidebar">
+  <h4>On this page</h4>
+  <ul>
+    <li><a href="#intro">Intro &amp; types</a></li>
+    <li><a href="#distance">Distance metrics</a></li>
+    <li><a href="#kmeans">K-Means</a></li>
+    <li><a href="#medoids">K-Medoids</a></li>
+    <li><a href="#hierarchical">Hierarchical clustering</a></li>
+    <li><a href="#linkage">Linkage methods</a></li>
+    <li><a href="#silhouette">Silhouette</a></li>
+    <li><a href="#elbow">Elbow method</a></li>
+    <li><a href="#external">External evaluation</a></li>
+  </ul>
+  <h4>Quick links</h4>
+  <ul>
+    <li><a href="exercises.html#cluster">Practice problems</a></li>
+    <li><a href="cheatsheet.html#cluster">Formula reference</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+
+<h1 class="page-title"><span class="accent-bar"></span>Clustering</h1>
+<p class="subtitle">Unsupervised learning — finding groups of similar data without labels. K-Means, hierarchical, and the evaluation metrics for both.</p>
+
+<!-- ============= INTRO ============ -->
+<h2 id="intro">1. Introduction</h2>
+
+<p><strong>Clustering</strong> = unsupervised learning: no labels. Goal: find groups of similar data points. Each cluster typically has a <em>representative</em> (a centroid). Types:</p>
+
+<ul class="bullet">
+  <li><strong>Partitional:</strong> K-Means, K-Medoids (flat, top-down).</li>
+  <li><strong>Hierarchical:</strong> Agglomerative (bottom-up), Divisive (top-down). Output: <em>dendrogram</em>.</li>
+</ul>
+
+<!-- ============= DISTANCE ============ -->
+<h2 id="distance">2. Distance metrics</h2>
+
+<p>Almost every clustering decision begins with: "how do we measure distance?" Here are all the metrics you might see in an exam:</p>
+
+<div class="box blue">
+  <span class="box-label">1 · Euclidean (L2 norm)</span>
+  $$d(\mathbf{u}, \mathbf{v}) = \sqrt{\sum_{i=1}^{n}(u_i - v_i)^2} = \|\mathbf{u} - \mathbf{v}\|_2.$$
+  <p>Default for numeric data, straight-line distance. Squared version $d^2$ is used inside SSE because it avoids the square root.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">2 · Manhattan / Rectilinear / Taxicab (L1 norm)</span>
+  $$d(\mathbf{u}, \mathbf{v}) = \sum_{i=1}^{n}|u_i - v_i| = \|\mathbf{u} - \mathbf{v}\|_1.$$
+  <p>Grid-like settings, robust to outliers, high-dimensional data.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">3 · Chebyshev (L$_\infty$ norm)</span>
+  $$d(\mathbf{u}, \mathbf{v}) = \max_i |u_i - v_i| = \|\mathbf{u} - \mathbf{v}\|_\infty.$$
+  <p>Chessboard king moves, worst-case single-axis distance.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">4 · Minkowski (general, parameter $p$)</span>
+  $$d_p(\mathbf{u}, \mathbf{v}) = \left(\sum_{i=1}^{n}|u_i - v_i|^p\right)^{1/p}.$$
+  <p>$p = 1$ → Manhattan; $p = 2$ → Euclidean; $p \to \infty$ → Chebyshev.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">5 · Cosine similarity / distance</span>
+  $$\cos(\mathbf{u}, \mathbf{v}) = \frac{\mathbf{u}^\top\mathbf{v}}{\|\mathbf{u}\|_2\|\mathbf{v}\|_2}, \quad d_{\cos} = 1 - \cos(\mathbf{u}, \mathbf{v}).$$
+  <p>Text/document vectors where direction matters, not magnitude.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">6 · Hamming (for categorical / binary)</span>
+  $$d_H(\mathbf{u}, \mathbf{v}) = \sum_{i=1}^{n} \mathbb{1}[u_i \neq v_i].$$
+  <p>String comparison, DNA sequences, categorical features.</p>
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Which metric for which data?</span>
+  <ul class="bullet">
+    <li>Numeric, no outliers, geometric meaning → <strong>Euclidean</strong>.</li>
+    <li>Numeric with outliers, or grid-aligned → <strong>Manhattan</strong>.</li>
+    <li>Categorical / binary → <strong>Hamming</strong>.</li>
+    <li>Text / high-dim sparse → <strong>Cosine</strong>.</li>
+  </ul>
+  <p><strong>Exam tip:</strong> always check which metric is requested. Results differ drastically!</p>
+</div>
+
+<!-- ============= KMEANS ============ -->
+<h2 id="kmeans">3. K-Means</h2>
+
+<h3>Algorithm</h3>
+<ol class="bullet">
+  <li>Pick $k$ initial centroids.</li>
+  <li><strong>Assign:</strong> each point to the nearest centroid.</li>
+  <li><strong>Update:</strong> recompute centroids = mean of members.</li>
+  <li>Repeat 2–3 until convergence.</li>
+</ol>
+
+<div class="box gray">
+  <span class="box-label">Objective (SSE)</span>
+  $$\text{SSE} = \sum_{j=1}^{k}\sum_{\mathbf{x} \in C_j} \|\mathbf{x} - \mathbf{m}_j\|_2^2.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $k$ = number of clusters; $C_j$ = points in cluster $j$; $\mathbf{m}_j$ = centroid (mean) of cluster $j$. Lower SSE = tighter clusters.
+</div>
+
+<p><strong>Complexity:</strong> $\mathcal{O}(t \cdot k \cdot n)$ — considered linear, where $t$ = iterations, $n$ = data points.</p>
+
+<h3>Weaknesses</h3>
+<ul class="bullet">
+  <li>Works only for numerical data (mean must be defined). For categorical → K-Modes.</li>
+  <li>User must specify $k$.</li>
+  <li>Sensitive to outliers → use K-Medoids instead.</li>
+  <li>Sensitive to initial centroids (different runs may give different results).</li>
+</ul>
+
+<h3>Worked example — K-Means with Manhattan distance</h3>
+
+<p>8 points: A1(2,10), A2(2,5), A3(8,4), A4(5,8), A5(7,5), A6(6,4), A7(1,2), A8(4,9). $k = 3$. Initial centroids: $C_1 = A1$, $C_2 = A4$, $C_3 = A7$.</p>
+
+<div class="box gray">
+  <p><strong>Iter 1:</strong> Cluster 1 = {A1}; Cluster 2 = {A3, A4, A5, A6, A8}; Cluster 3 = {A2, A7}. New centroids: $\mathbf{m}_1 = (2,10)$, $\mathbf{m}_2 = (6,6)$, $\mathbf{m}_3 = (1.5, 3.5)$.</p>
+  <p><strong>Iter 2:</strong> A8 moves to Cluster 1. Centroids: $(3, 9.5), (6.5, 5.25), (1.5, 3.5)$.</p>
+  <p><strong>Iter 3:</strong> A4 moves to Cluster 1. Centroids: $(3.67, 9), (7, 4.33), (1.5, 3.5)$.</p>
+  <p><strong>Iter 4:</strong> Converged. Final: $\{A1, A4, A8\}, \{A3, A5, A6\}, \{A2, A7\}$.</p>
+</div>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA — clustering players by playing style</span>
+  <p>Features: $x_1$ = 3PA per game, $x_2$ = APG.</p>
+  <table class="data">
+    <thead><tr><th>Player</th><th>3PA</th><th>APG</th></tr></thead>
+    <tbody>
+      <tr><td>S. Curry</td><td>11.8</td><td>5.1</td></tr>
+      <tr><td>L. Doncic</td><td>9.9</td><td>9.8</td></tr>
+      <tr><td>N. Jokić</td><td>2.9</td><td>9.0</td></tr>
+      <tr><td>G. Antetokounmpo</td><td>2.7</td><td>6.5</td></tr>
+      <tr><td>J. Embiid</td><td>4.1</td><td>5.6</td></tr>
+      <tr><td>T. Haliburton</td><td>7.1</td><td>10.9</td></tr>
+    </tbody>
+  </table>
+  <p>With $k = 2$: Cluster A (pure shooter) = {Curry}, centroid ≈ $(11.8, 5.1)$. Cluster B (playmakers / bigs) = the rest, centroid ≈ $\left(\frac{9.9+2.9+2.7+4.1+7.1}{5}, \frac{9.8+9.0+6.5+5.6+10.9}{5}\right) = (5.34, 8.36)$.</p>
+</div>
+
+<!-- ============= K-MEDOIDS ============ -->
+<h2 id="medoids">4. K-Medoids — outlier resistance</h2>
+
+<div class="box yellow">
+  <span class="box-label">K-Means problem</span>
+  <p>The mean is sensitive to outliers — one extreme point can drag the centroid far, distorting the cluster.</p>
+</div>
+
+<p><strong>K-Medoids:</strong> instead of using the <em>mean</em>, the centroid is chosen as an <em>actual data point</em> that minimizes total distance to cluster members (multidimensional median analogue). More robust to outliers.</p>
+
+<table class="data">
+  <thead><tr><th></th><th>K-Means</th><th>K-Medoids</th></tr></thead>
+  <tbody>
+    <tr><td>Centroid</td><td>Mean (need not be a real point)</td><td>An actual data point</td></tr>
+    <tr><td>Outlier-resistant</td><td>No</td><td>Yes</td></tr>
+    <tr><td>Speed</td><td>Fast $\mathcal{O}(n)$</td><td>Slow $\mathcal{O}(n^2)$</td></tr>
+    <tr><td>Best for</td><td>Clean numerical</td><td>Numerical with outliers</td></tr>
+  </tbody>
+</table>
+
+<!-- ============= HIERARCHICAL ============ -->
+<h2 id="hierarchical">5. Hierarchical (agglomerative) clustering</h2>
+
+<p><strong>Idea:</strong> start with each point as its own cluster, repeatedly merge the closest pair until one cluster remains. Output: a <strong>dendrogram</strong> you can cut at any height to get any number of clusters.</p>
+
+<!-- ============= LINKAGE ============ -->
+<h2 id="linkage">6. Linkage methods</h2>
+
+<p>When two clusters $A$ and $B$ have just been merged into $(A,B)$, how do we compute the distance to some other cluster $X$?</p>
+
+<div class="box blue">
+  <span class="box-label">1 · Single linkage (nearest-neighbor / MIN)</span>
+  $$d((A,B), X) = \min(d(A,X), d(B,X)) = \min_{a \in A \cup B,\, x \in X} d(a, x).$$
+  <p><strong>Behavior:</strong> can produce long, stringy chains (<em>chaining effect</em>). <strong>Strength:</strong> can find non-elliptical clusters.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">2 · Complete linkage (furthest-neighbor / MAX)</span>
+  $$d((A,B), X) = \max(d(A,X), d(B,X)) = \max_{a \in A \cup B,\, x \in X} d(a, x).$$
+  <p><strong>Behavior:</strong> compact, roughly spherical clusters. <strong>Weakness:</strong> sensitive to outliers.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">3 · Average linkage (UPGMA)</span>
+  $$d((A,B), X) = \text{avg}(d(A,X), d(B,X)) = \frac{1}{|A \cup B||X|}\sum_{a \in A \cup B}\sum_{x \in X} d(a, x).$$
+  <p><strong>Behavior:</strong> balanced. Most commonly used in practice.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">4 · Centroid linkage</span>
+  $$d((A,B), X) = d(\mathbf{m}_{A \cup B}, \mathbf{m}_X).$$
+  <p>Can give non-monotonic dendrograms (rare).</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">5 · Ward's method</span>
+  <p>Distance = increase in total within-cluster SSE when merging. Minimizes within-cluster variance; tends to produce equally-sized clusters.</p>
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Quick decision</span>
+  <table class="data">
+    <thead><tr><th>Behavior wanted</th><th>Linkage</th></tr></thead>
+    <tbody>
+      <tr><td>Irregular shapes, chains allowed</td><td>Single</td></tr>
+      <tr><td>Compact spherical clusters</td><td>Complete</td></tr>
+      <tr><td>Balanced general-purpose</td><td>Average</td></tr>
+      <tr><td>Minimize variance (equal-size groups)</td><td>Ward</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<h3>Worked example — Single Linkage on 6 points (Euclidean)</h3>
+
+<p>Data: P1(0.40, 0.53), …, P6(0.45, 0.30). Initial distance matrix:</p>
+
+<table class="data">
+  <thead><tr><th></th><th>P1</th><th>P2</th><th>P3</th><th>P4</th><th>P5</th><th>P6</th></tr></thead>
+  <tbody>
+    <tr><td>P1</td><td>0</td><td></td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>P2</td><td>0.23</td><td>0</td><td></td><td></td><td></td><td></td></tr>
+    <tr><td>P3</td><td>0.22</td><td>0.14</td><td>0</td><td></td><td></td><td></td></tr>
+    <tr><td>P4</td><td>0.37</td><td>0.19</td><td>0.16</td><td>0</td><td></td><td></td></tr>
+    <tr><td>P5</td><td>0.34</td><td>0.14</td><td>0.29</td><td>0.28</td><td>0</td><td></td></tr>
+    <tr><td>P6</td><td>0.24</td><td>0.24</td><td>0.10</td><td>0.22</td><td>0.39</td><td>0</td></tr>
+  </tbody>
+</table>
+
+<p><strong>Merge order:</strong> $\{P3, P6\}$ at 0.10 → $\{P2, P5\}$ at 0.14 → these two merge at 0.14 → +P4 at 0.16 → +P1 at 0.22.</p>
+
+<!-- ============= SILHOUETTE ============ -->
+<h2 id="silhouette">7. Silhouette coefficient</h2>
+
+<p>The most common <strong>internal</strong> evaluation metric — no ground truth needed.</p>
+
+<div class="box gray">
+  <span class="box-label">For each object $o$</span>
+  $$a(o) = \frac{1}{|C(o)| - 1}\sum_{p \in C(o)} d(o, p),$$
+  $$b(o) = \min_{C_i \neq C(o)} \left[ \frac{1}{|C_i|}\sum_{p \in C_i} d(o, p) \right],$$
+  $$S(o) = \begin{cases} 0, & a(o) = 0 \\ \dfrac{b(o) - a(o)}{\max(a(o), b(o))}, & \text{otherwise.} \end{cases}$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $a(o)$ = average intra-cluster distance (tightness); $b(o)$ = mean distance to <em>closest other</em> cluster (separation); $S(o) \in [-1, 1]$: ≈ 1 good, ≈ 0 borderline, ≈ −1 misclustered.
+</div>
+
+<p><strong>Overall scores:</strong> $S(C_i) = \tfrac{1}{|C_i|}\sum_{o \in C_i} S(o)$, $S(\mathcal{C}) = \tfrac{1}{|\mathcal{D}|}\sum_{o \in \mathcal{D}} S(o)$.</p>
+
+<table class="data">
+  <thead><tr><th>$S(\mathcal{C})$ range</th><th>Structure strength</th></tr></thead>
+  <tbody>
+    <tr><td>0.70 – 1.00</td><td>Strong</td></tr>
+    <tr><td>0.50 – 0.70</td><td>Moderate</td></tr>
+    <tr><td>0.25 – 0.50</td><td>Weak</td></tr>
+    <tr><td>≤ 0.25</td><td>No structure</td></tr>
+  </tbody>
+</table>
+
+<div class="box yellow">
+  <span class="box-label">Reading a silhouette plot</span>
+  <p>To draw one: compute $S(o)$ for each point, group by cluster, sort each cluster low-to-high, plot horizontal bars (width = $S(o)$), draw a vertical red line at $S(\mathcal{C})$.</p>
+  <p>The right number of clusters is the one where:</p>
+  <ol class="bullet">
+    <li>$S(\mathcal{C})$ is highest (red line farthest right).</li>
+    <li>Many clusters exceed the red line.</li>
+    <li>Clusters are similarly sized.</li>
+    <li>Few points have negative silhouette.</li>
+  </ol>
+  <p><strong>vs Elbow:</strong> Elbow uses SSE (lower is better, look for elbow). Silhouette uses $S(\mathcal{C})$ (higher is better, look for the peak).</p>
+</div>
+
+<h3>Worked example (1D)</h3>
+
+<p>Cluster $A = \{1, 2\}$, $B = \{5, 6\}$. For $o = 1$ in $A$:</p>
+$$a(1) = \frac{1}{|A| - 1} d(1, 2) = \frac{1}{1} \cdot 1 = 1.$$
+$$b(1) = \frac{1}{|B|}(d(1,5) + d(1,6)) = \frac{1}{2}(4 + 5) = 4.5.$$
+$$S(1) = \frac{4.5 - 1}{4.5} \approx 0.778 \;\text{(strong structure)}.$$
+
+<!-- ============= ELBOW ============ -->
+<h2 id="elbow">8. Elbow method</h2>
+
+<p>Plot SSE versus $k$. Pick the $k$ at the elbow where the curve bends sharply.</p>
+
+$$\text{SSQ} = \sum_{o \in C_i,\, c_i \in c} d^2(o, c_i) \quad \text{(lower is better)}.$$
+
+<p>Note: SSE <em>monotonically decreases</em> as $k$ increases (so SSE alone cannot be used to pick $k$ — combine with Elbow / Silhouette).</p>
+
+<!-- ============= EXTERNAL ============ -->
+<h2 id="external">9. External evaluation (need ground truth)</h2>
+
+<p>Compare object pairs against a ground truth $G$. Let $S_C$ = pairs co-clustered by us, $S_G$ = pairs co-grouped in truth.</p>
+
+<table class="data">
+  <thead><tr><th>Pair status</th><th>Definition</th></tr></thead>
+  <tbody>
+    <tr><td>TP</td><td>Co-clustered AND co-grouped (correctly together)</td></tr>
+    <tr><td>FP</td><td>Co-clustered BUT NOT co-grouped (wrongly together)</td></tr>
+    <tr><td>FN</td><td>NOT co-clustered BUT co-grouped (wrongly apart)</td></tr>
+    <tr><td>TN</td><td>NOT co-clustered AND NOT co-grouped (correctly apart)</td></tr>
+  </tbody>
+</table>
+
+<div class="box gray">
+  <span class="box-label">Pair-based metrics</span>
+  $$\text{Precision} = \frac{TP}{TP + FP}, \quad \text{Recall} = \frac{TP}{TP + FN}, \quad F1 = \frac{2 \cdot P \cdot R}{P + R}.$$
+  $$\text{Rand Index} = \frac{TP + TN}{TP + FP + FN + TN}, \quad \text{Jaccard} = \frac{TP}{TP + FP + FN}.$$
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Which evaluation when?</span>
+  <ul class="bullet">
+    <li>No ground truth + want a number → <strong>Silhouette</strong>.</li>
+    <li>No ground truth + choosing $k$ → <strong>Elbow</strong> on SSE or <strong>peak of Silhouette</strong>.</li>
+    <li>Have ground truth labels → <strong>F1 / Rand Index / Jaccard</strong>.</li>
+    <li>Want robust-to-chance metric → <strong>Adjusted Rand Index (ARI)</strong> or NMI.</li>
+  </ul>
+</div>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA — clustering evaluation</span>
+  <p>Group players into 5 clusters by stats; compare with official positions (PG/SG/SF/PF/C as ground truth). For a small example with 6 pairs: $TP=3, FP=1, FN=1, TN=1$.</p>
+  $$\text{Precision} = \frac{3}{4} = 0.75, \quad \text{Recall} = \frac{3}{4} = 0.75, \quad F1 = \frac{2(0.75)(0.75)}{1.5} = 0.75.$$
+  <p>A high F1 means the clustering matches official positions well.</p>
+</div>
+
+<div style="margin-top: 48px; padding: 24px; background: var(--paper-2); border-radius: 6px; text-align: center;">
+  <p style="font-family: var(--serif); font-size: 18px; color: var(--ink); margin-bottom: 8px;">Next:</p>
+  <a href="neural-networks.html" class="btn" style="background: var(--accent-nn); color: var(--paper); padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">→ Neural Networks &amp; Backprop</a>
+</div>
+
+</main>
+</div>
+
+<footer>
+  KASDD Notebook · <a href="exercises.html#cluster">Practice this topic</a> · <a href="cheatsheet.html">All formulas</a>
+</footer>
+
+</body>
+</html>

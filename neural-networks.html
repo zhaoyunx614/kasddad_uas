@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neural Networks &amp; Backprop — KASDD Notebook</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+<script defer src="main.js"></script>
+</head>
+<body class="nn">
+
+<nav class="topbar">
+  <a href="index.html" class="brand"><span class="mark">K</span> KASDD Notebook</a>
+  <ul class="nav-links">
+    <li><a href="index.html">Home</a></li>
+    <li><a href="probability.html">Probability</a></li>
+    <li><a href="linear-models.html">Linear Models</a></li>
+    <li><a href="clustering.html">Clustering</a></li>
+    <li><a href="neural-networks.html">Neural Networks</a></li>
+    <li><a href="exercises.html">Exercises</a></li>
+    <li><a href="cheatsheet.html">Cheatsheet</a></li>
+  </ul>
+</nav>
+
+<div class="page-wrap">
+
+<aside class="sidebar">
+  <h4>On this page</h4>
+  <ul>
+    <li><a href="#motivation">Motivation</a></li>
+    <li><a href="#architecture">MLP architecture</a></li>
+    <li><a href="#params">Counting parameters</a></li>
+    <li><a href="#activations">Activation functions</a></li>
+    <li><a href="#losses">Loss functions</a></li>
+    <li><a href="#shortcut">The universal shortcut</a></li>
+    <li><a href="#backprop">Backpropagation</a></li>
+    <li><a href="#worked-tanh">Worked: tanh + MSE</a></li>
+    <li><a href="#worked-softplus">Worked: softplus + softmax</a></li>
+  </ul>
+  <h4>Quick links</h4>
+  <ul>
+    <li><a href="exercises.html#nn">Practice problems</a></li>
+    <li><a href="cheatsheet.html#nn">Formula reference</a></li>
+  </ul>
+</aside>
+
+<main class="content">
+
+<h1 class="page-title"><span class="accent-bar"></span>Neural networks</h1>
+<p class="subtitle">Multilayer perceptrons, activation functions, and the backpropagation algorithm — the deepest topic of KASDD, broken into bite-sized pieces.</p>
+
+<!-- ============= MOTIVATION ============ -->
+<h2 id="motivation">1. Motivation — feature learning</h2>
+
+<p>Linear models fail on data that isn't linearly separable (e.g., concentric circles). <strong>Solution:</strong> transform $\phi(\mathbf{x})$ into a new space where the data becomes linearly separable:</p>
+
+$$\mathbf{y} = g(\mathbf{W}\phi(\mathbf{x})).$$
+
+<p>Designing $\phi$ by hand is hard. <strong>NN idea:</strong> $\phi$ is learned <em>together</em> with the final classifier.</p>
+
+<!-- ============= ARCHITECTURE ============ -->
+<h2 id="architecture">2. MLP architecture</h2>
+
+<p>An $L$-layer feedforward NN. With $\mathbf{a}^{(0)} = \mathbf{x}$ and for $\ell = 1, \ldots, L$:</p>
+
+<div class="box gray">
+  <span class="box-label">Forward pass</span>
+  $$\mathbf{p}^{(\ell)} = \mathbf{W}^{(\ell)}\mathbf{a}^{(\ell - 1)} + \mathbf{b}^{(\ell)} \quad \text{(pre-activation)},$$
+  $$\mathbf{a}^{(\ell)} = g^{(\ell)}(\mathbf{p}^{(\ell)}) \quad \text{(activation)}.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $L$ = number of layers; $\mathbf{a}^{(\ell)}$ = output of layer $\ell$ (also input to layer $\ell+1$); $\mathbf{p}^{(\ell)}$ = pre-activation (linear part before nonlinearity); $\mathbf{W}^{(\ell)}, \mathbf{b}^{(\ell)}$ = weights & biases; $g^{(\ell)}$ = activation function.
+</div>
+
+<p>If $\dim(\mathbf{a}^{(\ell)}) = D_\ell$, then $\mathbf{W}^{(\ell)} \in \mathbb{R}^{D_\ell \times D_{\ell-1}}$ and $\mathbf{b}^{(\ell)} \in \mathbb{R}^{D_\ell}$.</p>
+
+<!-- ============= PARAMETERS ============ -->
+<h2 id="params">3. Counting parameters</h2>
+
+<div class="box gray">
+  <span class="box-label">Total parameter count</span>
+  $$\sum_{\ell=1}^{L} (D_\ell D_{\ell-1} + D_\ell).$$
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Typical exam problem — counting dimensions</span>
+  <p><strong>Problem.</strong> A FFNN for 3-class classification. Input has 13 features, first layer has 23 units.</p>
+  <p><strong>Layer 1</strong> (input → 23 units): $\mathbf{W}^{(1)} \in \mathbb{R}^{23 \times 13}$, $\mathbf{b}^{(1)} \in \mathbb{R}^{23}$. Total: $23 \cdot 13 + 23 = 322$.</p>
+  <p><strong>Layer 2</strong> (23 → 3 output): $\mathbf{W}^{(2)} \in \mathbb{R}^{3 \times 23}$, $\mathbf{b}^{(2)} \in \mathbb{R}^{3}$. Total: $3 \cdot 23 + 3 = 72$.</p>
+  <p><strong>Final-layer activation:</strong> Softmax (3 mutually exclusive classes).</p>
+  <p><strong>Grand total: $322 + 72 = 394$ parameters.</strong></p>
+  <p><strong>General rule:</strong> rows of $\mathbf{W}^{(\ell)}$ = units in layer $\ell$; columns = units in previous layer. Bias matches units in its own layer.</p>
+</div>
+
+<!-- ============= ACTIVATIONS ============ -->
+<h2 id="activations">4. Activation functions — complete catalog</h2>
+
+<p>For each: the function $g(u)$, its derivative $g'(u)$, range, and typical use.</p>
+
+<div class="box blue">
+  <span class="box-label">1 · Identity / Linear</span>
+  $$g(u) = u, \qquad g'(u) = 1.$$
+  <p><strong>Range:</strong> $(-\infty, \infty)$. <strong>Use:</strong> regression output.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">2 · Sigmoid</span>
+  $$g(u) = \text{Sig}(u) = \frac{1}{1 + e^{-u}}, \qquad g'(u) = g(u)(1 - g(u)).$$
+  <p><strong>Range:</strong> $(0, 1)$. <strong>Use:</strong> binary classification output. <strong>Risk:</strong> vanishing gradients for large $|u|$.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">3 · Tanh</span>
+  $$g(u) = \tanh(u) = \frac{e^u - e^{-u}}{e^u + e^{-u}}, \qquad g'(u) = 1 - \tanh^2(u) = 1 - g(u)^2.$$
+  <p><strong>Range:</strong> $(-1, 1)$. <strong>Use:</strong> zero-centered hidden activations.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">4 · ReLU</span>
+  $$g(u) = \max(0, u), \qquad g'(u) = \begin{cases} 1 & u > 0 \\ 0 & u < 0 \end{cases}.$$
+  <p><strong>Range:</strong> $[0, \infty)$. <strong>Use:</strong> default hidden layer in deep nets. <strong>Risk:</strong> dying ReLU (neurons stuck at 0).</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">5 · Leaky ReLU</span>
+  $$g(u) = \begin{cases} u & u \geq 0 \\ \alpha u & u < 0 \end{cases}, \qquad g'(u) = \begin{cases} 1 & u \geq 0 \\ \alpha & u < 0 \end{cases}.$$
+  <p>$\alpha$ small (typically 0.01). <strong>Use:</strong> avoid dying ReLU.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">6 · Softplus (smooth ReLU)</span>
+  $$g(u) = \ln(1 + e^u), \qquad g'(u) = \frac{1}{1 + e^{-u}} = \text{Sig}(u).$$
+  <p><strong>Range:</strong> $(0, \infty)$. <strong>Key fact:</strong> its derivative <em>is</em> the sigmoid. Appears often in exam problems!</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">7 · ELU</span>
+  $$g(u) = \begin{cases} u & u > 0 \\ \alpha(e^u - 1) & u \leq 0 \end{cases}, \qquad g'(u) = \begin{cases} 1 & u > 0 \\ \alpha e^u & u \leq 0 \end{cases}.$$
+  <p><strong>Range:</strong> $(-\alpha, \infty)$. Pushes mean activations toward 0.</p>
+</div>
+
+<div class="box blue">
+  <span class="box-label">8 · Softmax (vector → simplex)</span>
+  $$g(\mathbf{u})_k = \text{softmax}_k(\mathbf{u}) = \frac{e^{u_k}}{\sum_{\ell=1}^{K} e^{u_\ell}}.$$
+  <p><strong>Range:</strong> simplex (each component in $(0,1)$, sum = 1). <strong>Use:</strong> multi-class output.</p>
+  <p><strong>Jacobian:</strong> $\dfrac{\partial s_k}{\partial u_j} = s_k(\mathbb{1}[k=j] - s_j)$.</p>
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Output activation by task</span>
+  <table class="data">
+    <thead><tr><th>Task</th><th>Output dim</th><th>Final activation</th></tr></thead>
+    <tbody>
+      <tr><td>Regression</td><td>≥ 1</td><td>Identity / Linear</td></tr>
+      <tr><td>Binary classification</td><td>1</td><td>Sigmoid</td></tr>
+      <tr><td>Multi-class (mutually exclusive)</td><td>$K$</td><td>Softmax</td></tr>
+      <tr><td>Multi-label (independent)</td><td>$K$</td><td>Sigmoid on each output</td></tr>
+    </tbody>
+  </table>
+</div>
+
+<div class="box yellow">
+  <span class="box-label">Hidden-layer activation — which one?</span>
+  <ul class="bullet">
+    <li><strong>Default modern choice:</strong> ReLU (fast, simple, works in most cases).</li>
+    <li><strong>Suspect dying ReLU?</strong> Leaky ReLU or ELU.</li>
+    <li><strong>Want zero-centered hidden representations?</strong> Tanh.</li>
+    <li><strong>Want smooth differentiability?</strong> Softplus or sigmoid.</li>
+  </ul>
+</div>
+
+<!-- ============= LOSSES ============ -->
+<h2 id="losses">5. Loss functions for neural networks</h2>
+
+<div class="box gray">
+  <span class="box-label">The four loss functions you need</span>
+  <p><strong>Univariate regression:</strong> $L = \tfrac{1}{2}(a^{(L)} - y)^2$</p>
+  <p><strong>Multivariate regression:</strong> $L = \tfrac{1}{2}(\mathbf{a}^{(L)} - \mathbf{y})^\top(\mathbf{a}^{(L)} - \mathbf{y})$</p>
+  <p><strong>Binary classification (BCE):</strong> $L = -y \log a^{(L)} - (1 - y)\log(1 - a^{(L)})$</p>
+  <p><strong>Multi-class (CCE):</strong> $L = -\sum_{k=1}^{K} y_k \log a^{(L)}_k = -\mathbf{y}^\top \log \mathbf{a}^{(L)}$</p>
+  <p><strong>Multi-label:</strong> $L = -\sum_k \left[y_k \log a^{(L)}_k + (1 - y_k)\log(1 - a^{(L)}_k)\right]$</p>
+</div>
+
+<!-- ============= SHORTCUT ============ -->
+<h2 id="shortcut">6. The universal output-layer shortcut</h2>
+
+<div class="box blue">
+  <span class="box-label">When activation + loss are matched, magic happens</span>
+  <p>For all three standard pairings — and <em>only</em> these — the gradient with respect to the pre-activation collapses to <strong>prediction − target</strong>:</p>
+  $$\boxed{\;\overline{\mathbf{p}}^{(L)} = \mathbf{a}^{(L)} - \mathbf{y}\;}$$
+  <p>This holds when:</p>
+  <ul class="bullet">
+    <li><strong>Identity + MSE</strong></li>
+    <li><strong>Sigmoid + BCE</strong></li>
+    <li><strong>Softmax + CCE</strong></li>
+  </ul>
+  <p>This is why these three pairings are the standard — the math is the cleanest.</p>
+</div>
+
+<!-- ============= BACKPROP ============ -->
+<h2 id="backprop">7. Backpropagation</h2>
+
+<p>Backprop is the chain rule applied carefully. Let $\overline{v} = \dfrac{\partial L}{\partial v}$ (the <em>adjoint</em> / gradient w.r.t. $v$). For a 2-layer network:</p>
+
+<h3>Forward (2-layer)</h3>
+
+$$\mathbf{u}^{(1)} = \mathbf{W}^{(1)}\mathbf{x}, \quad \mathbf{p}^{(1)} = \mathbf{u}^{(1)} + \mathbf{b}^{(1)}, \quad \mathbf{a}^{(1)} = g^{(1)}(\mathbf{p}^{(1)}),$$
+$$\mathbf{u}^{(2)} = \mathbf{W}^{(2)}\mathbf{a}^{(1)}, \quad \mathbf{p}^{(2)} = \mathbf{u}^{(2)} + \mathbf{b}^{(2)}, \quad \mathbf{a}^{(2)} = g^{(2)}(\mathbf{p}^{(2)}), \quad L = L(\mathbf{a}^{(2)}, \mathbf{y}).$$
+
+<h3>Backward</h3>
+
+<div class="box gray">
+  <span class="box-label">Backward pass (2-layer)</span>
+  $$\overline{L} = 1,$$
+  $$\overline{\mathbf{a}}^{(2)} = \overline{L} \cdot \frac{\partial L}{\partial \mathbf{a}^{(2)}}, \quad \overline{\mathbf{p}}^{(2)} = \overline{\mathbf{a}}^{(2)} \odot g^{(2)\prime}(\mathbf{p}^{(2)}),$$
+  $$\overline{\mathbf{b}}^{(2)} = \overline{\mathbf{p}}^{(2)}, \quad \overline{\mathbf{W}}^{(2)} = \overline{\mathbf{p}}^{(2)}(\mathbf{a}^{(1)})^\top,$$
+  $$\overline{\mathbf{a}}^{(1)} = (\mathbf{W}^{(2)})^\top \overline{\mathbf{p}}^{(2)}, \quad \overline{\mathbf{p}}^{(1)} = \overline{\mathbf{a}}^{(1)} \odot g^{(1)\prime}(\mathbf{p}^{(1)}),$$
+  $$\overline{\mathbf{b}}^{(1)} = \overline{\mathbf{p}}^{(1)}, \quad \overline{\mathbf{W}}^{(1)} = \overline{\mathbf{p}}^{(1)} \mathbf{x}^\top.$$
+</div>
+
+<div class="where">
+  <strong>Where:</strong> $\odot$ = elementwise (Hadamard) product; $g^{(\ell)\prime}$ = derivative of activation at layer $\ell$.
+</div>
+
+<h3>Universal recipe (L-layer)</h3>
+
+<div class="box blue">
+  <span class="box-label">Memorize this — same pattern at every layer</span>
+  <p>For $\ell = L, L-1, \ldots, 1$:</p>
+  $$\overline{\mathbf{W}}^{(\ell)} = \overline{\mathbf{p}}^{(\ell)}(\mathbf{a}^{(\ell-1)})^\top,$$
+  $$\overline{\mathbf{b}}^{(\ell)} = \overline{\mathbf{p}}^{(\ell)},$$
+  $$\overline{\mathbf{a}}^{(\ell-1)} = (\mathbf{W}^{(\ell)})^\top \overline{\mathbf{p}}^{(\ell)},$$
+  $$\overline{\mathbf{p}}^{(\ell-1)} = \overline{\mathbf{a}}^{(\ell-1)} \odot g^{(\ell-1)\prime}(\mathbf{p}^{(\ell-1)}).$$
+  <p><strong>Then update:</strong> $\mathbf{W}^{(\ell)} := \mathbf{W}^{(\ell)} - \alpha\,\overline{\mathbf{W}}^{(\ell)}$, $\mathbf{b}^{(\ell)} := \mathbf{b}^{(\ell)} - \alpha\,\overline{\mathbf{b}}^{(\ell)}$.</p>
+</div>
+
+<h3>Derivative substitutions by activation</h3>
+
+<table class="data">
+  <thead><tr><th>Activation</th><th>$g^{(\ell)\prime}(\mathbf{p}^{(\ell)})$ to plug in</th></tr></thead>
+  <tbody>
+    <tr><td>Identity</td><td>$\mathbf{1}$ (vector of ones)</td></tr>
+    <tr><td>Sigmoid</td><td>$\mathbf{a}^{(\ell)} \odot (1 - \mathbf{a}^{(\ell)})$</td></tr>
+    <tr><td>Tanh</td><td>$1 - \mathbf{a}^{(\ell)} \odot \mathbf{a}^{(\ell)}$</td></tr>
+    <tr><td>ReLU</td><td>$\mathbb{1}[\mathbf{p}^{(\ell)} > 0]$ (0/1 mask)</td></tr>
+    <tr><td>Leaky ReLU</td><td>$\mathbb{1}[\mathbf{p}^{(\ell)} > 0] + \alpha\,\mathbb{1}[\mathbf{p}^{(\ell)} < 0]$</td></tr>
+    <tr><td>Softplus</td><td>$\text{Sig}(\mathbf{p}^{(\ell)})$</td></tr>
+    <tr><td>ELU</td><td>$\mathbb{1}[\mathbf{p}^{(\ell)} > 0] + \alpha e^{\mathbf{p}^{(\ell)}} \mathbb{1}[\mathbf{p}^{(\ell)} \leq 0]$</td></tr>
+  </tbody>
+</table>
+
+<div class="box yellow">
+  <span class="box-label">Mental model</span>
+  <p>The backward pass moves <strong>right-to-left</strong>, and at each step you <em>unwind</em> the forward operation. Each forward step "multiply by W → add b → apply g" becomes in reverse:</p>
+  <ol class="bullet">
+    <li>Multiply gradient elementwise by $g'$,</li>
+    <li>Copy to $\overline{\mathbf{b}}$,</li>
+    <li>Outer-product with input for $\overline{\mathbf{W}}$,</li>
+    <li>Multiply by $\mathbf{W}^\top$ to pass to previous layer.</li>
+  </ol>
+</div>
+
+<!-- ============= WORKED TANH ============ -->
+<h2 id="worked-tanh">8. Worked example — numerical backprop (tanh + identity, MSE)</h2>
+
+<p>2-layer FFNN. Input $\mathbf{x} = (-1, 1)^\top$, target $y = 1$. Layer 1: 3 tanh units. Layer 2: identity (univariate regression).</p>
+
+$$\mathbf{W}^{(1)} = \begin{pmatrix} 0.5 & -0.5 \\ 1 & 0.3 \\ -0.3 & 0.6 \end{pmatrix}, \quad \mathbf{b}^{(1)} = \begin{pmatrix} -1 \\ 1 \\ 1 \end{pmatrix},$$
+$$\mathbf{W}^{(2)} = (0.5,\, 0.2,\, 0.3), \quad b^{(2)} = 0.3.$$
+
+<h3>Forward</h3>
+
+$$\mathbf{u}^{(1)} = (-1, -0.7, 0.9)^\top, \quad \mathbf{p}^{(1)} = (-2, 0.3, 1.9)^\top,$$
+$$\mathbf{a}^{(1)} = (\tanh(-2), \tanh(0.3), \tanh(1.9))^\top = (-0.964, 0.291, 0.956)^\top,$$
+$$u^{(2)} = -0.482 + 0.0582 + 0.2868 = -0.137, \quad p^{(2)} = -0.137 + 0.3 = 0.163,$$
+$$a^{(2)} = 0.163, \quad L = \tfrac{1}{2}(0.163 - 1)^2 = 0.35.$$
+
+<h3>Backward</h3>
+
+$$\overline{a}^{(2)} = 0.163 - 1 = -0.837, \quad \overline{p}^{(2)} = -0.837,$$
+$$\overline{\mathbf{W}}^{(2)} = -0.837 \cdot (-0.964, 0.291, 0.956) = (0.807, -0.244, -0.800),$$
+$$\overline{\mathbf{a}}^{(1)} = -0.837 \cdot (0.5, 0.2, 0.3) = (-0.418, -0.167, -0.251),$$
+$$g^{(1)\prime} = 1 - \mathbf{a}^{(1)\odot 2} = (0.071, 0.915, 0.086),$$
+$$\overline{\mathbf{p}}^{(1)} = (-0.030, -0.153, -0.021),$$
+$$\overline{\mathbf{W}}^{(1)} = \overline{\mathbf{p}}^{(1)} \mathbf{x}^\top = \begin{pmatrix} 0.030 & -0.030 \\ 0.153 & -0.153 \\ 0.021 & -0.021 \end{pmatrix}.$$
+
+<!-- ============= WORKED SOFTPLUS ============ -->
+<h2 id="worked-softplus">9. Worked example — softplus + softmax (CCE)</h2>
+
+<p>2-layer FFNN, layer 1 softplus (2 hidden units), layer 2 softmax (3 classes). Input $\mathbf{x} = (1, -1, 1)$, target class 1 (one-hot $\mathbf{y} = (0, 1, 0)$).</p>
+
+$$\mathbf{W}^{(1)} = \begin{pmatrix} 0.5 & -0.5 & 0.8 \\ 1 & -0.2 & -0.6 \end{pmatrix}, \quad \mathbf{b}^{(1)} = \begin{pmatrix} 0.1 \\ -0.1 \end{pmatrix},$$
+$$\mathbf{W}^{(2)} = \begin{pmatrix} 0.2 & -0.1 \\ 0.4 & 0.2 \\ 0.3 & -0.2 \end{pmatrix}, \quad \mathbf{b}^{(2)} = \begin{pmatrix} 0.1 \\ 0.1 \\ -0.1 \end{pmatrix}.$$
+
+<h3>Forward layer 1</h3>
+$$\mathbf{p}^{(1)} = \mathbf{W}^{(1)}\mathbf{x} + \mathbf{b}^{(1)} = (1.9, 0.5),$$
+$$\mathbf{a}^{(1)} = (\ln(1 + e^{1.9}), \ln(1 + e^{0.5})) = (2.040, 0.974).$$
+
+<h3>Forward layer 2 + softmax</h3>
+$$\mathbf{p}^{(2)} = \mathbf{W}^{(2)}\mathbf{a}^{(1)} + \mathbf{b}^{(2)} \approx (0.310, 1.151, 0.317),$$
+$$\mathbf{a}^{(2)} = \text{softmax}(\mathbf{p}^{(2)}) \approx (0.24, 0.55, 0.24).$$
+
+<h3>Backward (softmax + CCE shortcut)</h3>
+$$\overline{\mathbf{p}}^{(2)} = \mathbf{a}^{(2)} - \mathbf{y} \approx (0.24, -0.45, 0.24).$$
+
+<p>Layer 1 gradient (using softplus derivative = sigmoid):</p>
+$$g^{(1)\prime}(\mathbf{p}^{(1)}) = (\text{Sig}(1.9), \text{Sig}(0.5)) = (0.870, 0.622),$$
+$$\overline{\mathbf{a}}^{(1)} = (\mathbf{W}^{(2)})^\top \overline{\mathbf{p}}^{(2)}, \quad \overline{\mathbf{p}}^{(1)} = \overline{\mathbf{a}}^{(1)} \odot g^{(1)\prime}(\mathbf{p}^{(1)}).$$
+<p>After computation: $\overline{\mathbf{p}}^{(1)} \approx (-0.065, -0.105)$.</p>
+
+<div class="box orange">
+  <span class="box-label">🏀 NBA — MVP voting share with MLP</span>
+  <p>2-layer FFNN with sigmoid output. Input (5 features): PPG, RPG, APG, FG%, Win%. Layer 1: 8 hidden units (ReLU). Layer 2: 1 sigmoid unit.</p>
+  <p>Parameter shapes: $\mathbf{W}^{(1)} \in \mathbb{R}^{8\times 5}, \mathbf{b}^{(1)} \in \mathbb{R}^8, \mathbf{W}^{(2)} \in \mathbb{R}^{1\times 8}, b^{(2)} \in \mathbb{R}$. Total: $40 + 8 + 8 + 1 = 57$ parameters.</p>
+  <p>For Nikola Jokić's 2023–24 season: $\mathbf{x} = (26.4, 12.4, 9.0, 58.3, 68.3)$. Suppose $p^{(2)} = 2.45$ after the forward pass:</p>
+  $$a^{(2)} = \text{Sig}(2.45) = \frac{1}{1 + e^{-2.45}} \approx 0.92.$$
+  <p>92% predicted MVP share — matches the actual MVP voting that season.</p>
+</div>
+
+<div style="margin-top: 48px; padding: 24px; background: var(--paper-2); border-radius: 6px; text-align: center;">
+  <p style="font-family: var(--serif); font-size: 18px; color: var(--ink); margin-bottom: 8px;">Now test yourself:</p>
+  <a href="exercises.html" class="btn" style="background: #d4a82a; color: var(--ink); padding: 12px 24px; text-decoration: none; border-radius: 4px; display: inline-block;">→ Practice on UAS problems</a>
+</div>
+
+</main>
+</div>
+
+<footer>
+  KASDD Notebook · <a href="exercises.html#nn">Practice this topic</a> · <a href="cheatsheet.html">All formulas</a>
+</footer>
+
+</body>
+</html>
