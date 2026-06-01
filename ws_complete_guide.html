@@ -931,7 +931,7 @@
 </section>
 
 <!-- ═══════════════════════════════════════════════════════════ -->
-<!-- WS 4: REGRESSION (with corrections) -->
+<!-- WS 4: REGRESSION — FULLY CORRECTED TO 100/100 -->
 <!-- ═══════════════════════════════════════════════════════════ -->
 <section id="ws4" class="ws-section">
 <div class="container">
@@ -940,7 +940,7 @@
     <div class="ws-title-block">
       <h2>Linear &amp; Logistic Regression — Gradient Descent</h2>
       <p>Batch GD · Minibatch GD · Logistic Regression · Parameter Update</p>
-      <span class="score-pill score-partial">⚠ 65.82/100 (attempt shown) → Corrected to 96/100 in review</span>
+      <span class="score-pill score-good">★ Fully Corrected to 100/100</span>
     </div>
   </div>
 
@@ -948,248 +948,135 @@
   <div class="step">
     <div class="step-header">
       <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">0</div>
-      <h3>Key Formulas — What Everything Means</h3>
+      <h3>Key Formulas — The Correct Update Rule</h3>
     </div>
     <div class="step-body">
-      <h4>Prediction Model h(x)</h4>
+      <h4>Prediction Model h(x) — Linear Regression</h4>
       <div class="formula-box accent4">
-        \[ h(\mathbf{x}) = w_0 x_0 + w_1 x_1 + w_2 x_2 = \mathbf{w}^T \mathbf{x} \]
+        \[ h(\mathbf{x}) = w_0 \cdot x_0 + w_1 \cdot x_1 + w_2 \cdot x_2 = \mathbf{w}^T \mathbf{x} \]
       </div>
       <div class="legend">
         <div class="legend-title">Symbol Legend</div>
-        <div class="legend-row"><span class="legend-sym">\(h(\mathbf{x})\)</span><span class="legend-def">Model prediction for input x</span></div>
-        <div class="legend-row"><span class="legend-sym">\(w_0\)</span><span class="legend-def">Bias weight (multiplied by \(x_0 = 1\) always)</span></div>
-        <div class="legend-row"><span class="legend-sym">\(x_0\)</span><span class="legend-def">Always = 1 (bias/intercept term — a constant added to the feature vector)</span></div>
-        <div class="legend-row"><span class="legend-sym">\(w_1, w_2\)</span><span class="legend-def">Weights for features \(x_1\) and \(x_2\)</span></div>
-        <div class="legend-row"><span class="legend-sym">\(\mathbf{w}^T \mathbf{x}\)</span><span class="legend-def">Dot product of weight vector and augmented input vector</span></div>
+        <div class="legend-row"><span class="legend-sym">\(h(\mathbf{x})\)</span><span class="legend-def">Predicted value for input x</span></div>
+        <div class="legend-row"><span class="legend-sym">\(x_0\)</span><span class="legend-def">ALWAYS = 1 — the constant bias term appended to every input row</span></div>
+        <div class="legend-row"><span class="legend-sym">\(w_0\)</span><span class="legend-def">Bias weight (multiplied by the constant x₀=1)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(w_1, w_2\)</span><span class="legend-def">Feature weights for x₁ and x₂</span></div>
       </div>
 
-      <h4>Gradient (per data point i) — Linear Regression</h4>
+      <h4>Gradient for One Sample i</h4>
       <div class="formula-box accent4">
         \[ \nabla_w L_i = (h(\mathbf{x}^{(i)}) - y^{(i)}) \cdot \mathbf{x}^{(i)T} \]
       </div>
       <div class="legend">
         <div class="legend-title">Symbol Legend</div>
-        <div class="legend-row"><span class="legend-sym">\((h(\mathbf{x}^{(i)}) - y^{(i)})\)</span><span class="legend-def">Prediction error for sample i: predicted value minus true value</span></div>
-        <div class="legend-row"><span class="legend-sym">\(\mathbf{x}^{(i)T}\)</span><span class="legend-def">The input row for sample i as a row vector: \((x_0^{(i)}, x_1^{(i)}, x_2^{(i)})\)</span></div>
-        <div class="legend-row"><span class="legend-sym">\(\nabla_w L_i\)</span><span class="legend-def">Gradient vector for sample i — has one component per weight</span></div>
+        <div class="legend-row"><span class="legend-sym">\((h(\mathbf{x}^{(i)}) - y^{(i)})\)</span><span class="legend-def">Error = predicted minus true value for sample i</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\mathbf{x}^{(i)T}\)</span><span class="legend-def">Augmented input row for sample i: (1, x₁⁽ⁱ⁾, x₂⁽ⁱ⁾)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\nabla_w L_i\)</span><span class="legend-def">3-element gradient vector — one component per weight</span></div>
       </div>
 
-      <h4>Weight Update — Gradient Descent</h4>
-      <div class="formula-box accent4">
-        \[ \mathbf{w}_{\text{new}} = \mathbf{w} - \frac{\alpha}{N_{\text{batch}}} \sum_{i \in \text{batch}} \nabla_w L_i \]
+      <div class="callout error-note">
+        <span class="callout-icon">🚨</span>
+        <div>
+          <p><strong>CRITICAL — The Correct Update Rule (verified by all WS answers):</strong></p>
+          <div class="formula-box accent4" style="margin:10px 0;">
+            \[ \mathbf{w}_{\text{new}} = \mathbf{w} - \alpha \cdot \sum_{i \in \text{batch}} \nabla_w L_i \]
+          </div>
+          <p>Multiply α by the <strong>raw sum</strong> of gradients — <strong>NO division by batch size N</strong>.</p>
+          <p>Proof: Q1a gives w₀ = 0 − 0.05×(−10.72) = <strong>0.536 ✓</strong>. Dividing by N=6 would give 0.089, which is wrong.</p>
+        </div>
       </div>
       <div class="legend">
-        <div class="legend-title">Symbol Legend</div>
-        <div class="legend-row"><span class="legend-sym">\(\alpha\)</span><span class="legend-def">Learning rate (given as 0.05 in all questions)</span></div>
-        <div class="legend-row"><span class="legend-sym">\(N_{\text{batch}}\)</span><span class="legend-def">Number of samples in the batch (for batch GD = all 6; for minibatch = 2)</span></div>
-        <div class="legend-row"><span class="legend-sym">\(\sum_{i \in \text{batch}} \nabla_w L_i\)</span><span class="legend-def">Sum of gradients over all samples in the current batch</span></div>
+        <div class="legend-title">Symbol Legend — Update Rule</div>
+        <div class="legend-row"><span class="legend-sym">\(\alpha\)</span><span class="legend-def">Learning rate = 0.05 (given in all questions)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\sum_{i \in \text{batch}}\)</span><span class="legend-def">Sum gradients over ALL samples in the batch — do NOT divide by N</span></div>
       </div>
     </div>
   </div>
 
-  <!-- Q1 Batch GD -->
+  <!-- Q1a BATCH GD -->
   <div class="sub-q">
-    <div class="sub-q-title">Question 1a — Batch Gradient Descent (1 epoch, lr=0.05, w=(0,−1,1))</div>
+    <div class="sub-q-title">Question 1a — Batch GD (1 epoch, α=0.05, w=(0,−1,1))</div>
 
     <div class="step">
       <div class="step-header">
         <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">1</div>
-        <h3>How to Fill the Table — Column by Column</h3>
+        <h3>Fill the Table — All 6 Samples</h3>
       </div>
       <div class="step-body">
-        <p>Initial weights: \(w_0=0, w_1=-1, w_2=1\). For each sample, compute 4 columns:</p>
-
+        <div class="callout info">
+          <span class="callout-icon">💡</span>
+          <p><strong>Recipe for every row:</strong> ① h(x) = w₀ + w₁·x₁ + w₂·x₂ &nbsp;② error = h(x) − y &nbsp;③ col₀ = error×1 &nbsp;④ col₁ = error×x₁ &nbsp;⑤ col₂ = error×x₂</p>
+        </div>
         <table class="calc-table">
           <tr>
-            <th>No</th><th>\(x_1\)</th><th>\(x_2\)</th><th>y</th>
-            <th>\(h(x)\)</th>
-            <th>\((h(x)-y)\cdot x_0\)</th>
-            <th>\((h(x)-y)\cdot x_1\)</th>
-            <th>\((h(x)-y)\cdot x_2\)</th>
+            <th>No</th><th>x₁</th><th>x₂</th><th>y</th>
+            <th>h(x)</th><th>err×x₀</th><th>err×x₁</th><th>err×x₂</th>
           </tr>
-          <tr>
-            <td>1</td><td>−1</td><td>−3</td><td>−5.4</td>
-            <td class="highlight">−2</td>
-            <td class="highlight">3.4</td>
-            <td class="highlight">−3.4</td>
-            <td class="highlight">−10.2</td>
-          </tr>
-          <tr>
-            <td>2</td><td>1</td><td>1</td><td>3.25</td>
-            <td>0</td><td>−3.25</td><td>−3.25</td><td>−3.25</td>
-          </tr>
-          <tr>
-            <td>3</td><td>1</td><td>2</td><td>6.5</td>
-            <td>1</td><td>−5.5</td><td>−5.5</td><td>−11</td>
-          </tr>
-          <tr>
-            <td>4</td><td>2</td><td>2</td><td>3.5</td>
-            <td>0</td><td>−3.5</td><td>−7</td><td>−7</td>
-          </tr>
-          <tr>
-            <td>5</td><td>0</td><td>1</td><td>5</td>
-            <td>1</td><td>−4</td><td>0</td><td>−4</td>
-          </tr>
-          <tr>
-            <td>6</td><td>3</td><td>0</td><td>−5.13</td>
-            <td>−3</td><td class="correct-val">2.13</td><td class="correct-val">6.39</td><td>0</td>
-          </tr>
-          <tr class="total-row">
-            <td colspan="4">Sum (Total Gradient)</td>
-            <td>—</td>
-            <td class="wrong-val">−10.72</td>
-            <td>−12.76</td>
-            <td>−35.45</td>
-          </tr>
+          <tr><td>1</td><td>−1</td><td>−3</td><td>−5.4</td><td class="highlight">−2</td><td>3.4</td><td>−3.4</td><td>−10.2</td></tr>
+          <tr><td>2</td><td>1</td><td>1</td><td>3.25</td><td>0</td><td>−3.25</td><td>−3.25</td><td>−3.25</td></tr>
+          <tr><td>3</td><td>1</td><td>2</td><td>6.5</td><td>1</td><td>−5.5</td><td>−5.5</td><td>−11</td></tr>
+          <tr><td>4</td><td>2</td><td>2</td><td>3.5</td><td>0</td><td>−3.5</td><td>−7</td><td>−7</td></tr>
+          <tr><td>5</td><td>0</td><td>1</td><td>5</td><td>1</td><td>−4</td><td>0</td><td>−4</td></tr>
+          <tr><td>6</td><td>3</td><td>0</td><td>−5.13</td><td>−3</td><td>2.13</td><td>6.39</td><td>0</td></tr>
+          <tr class="total-row"><td colspan="4">Total Σ</td><td>—</td><td class="correct-val">−10.72</td><td class="correct-val">−12.76</td><td class="correct-val">−35.45</td></tr>
         </table>
 
-        <div class="callout warn">
-          <span class="callout-icon">⚠️</span>
-          <p><strong>Important note on \(x_0\):</strong> Remember \(x_0 = 1\) for ALL rows. So the column \((h(x)-y) \cdot x_0 = (h(x) - y) \cdot 1 = (h(x) - y)\).</p>
+        <h4>Worked example — Row 1 (x₁=−1, x₂=−3, y=−5.4)</h4>
+        <div class="formula-box accent4">
+          \[ h(x) = 0(1) + (-1)(-1) + 1(-3) = 0 + 1 - 3 = -2 \]
+          \[ \text{error} = -2 - (-5.4) = 3.4 \]
+          \[ \text{col}_0 = 3.4\times1 = 3.4 \quad \text{col}_1 = 3.4\times(-1) = -3.4 \quad \text{col}_2 = 3.4\times(-3) = -10.2 \]
         </div>
 
-        <h4>Step-by-step for Row 1 (x₁=−1, x₂=−3, y=−5.4)</h4>
+        <h4>Weight update: w_new = w − α × Σ</h4>
         <div class="formula-box accent4">
-          \[ h(x) = w_0 \cdot 1 + w_1 \cdot x_1 + w_2 \cdot x_2 = 0\cdot1 + (-1)(-1) + 1\cdot(-3) = 0 + 1 - 3 = -2 \]
-          \[ \text{error} = h(x) - y = -2 - (-5.4) = 3.4 \]
-          \[ \text{col}_0 = 3.4 \times 1 = 3.4 \]
-          \[ \text{col}_1 = 3.4 \times (-1) = -3.4 \]
-          \[ \text{col}_2 = 3.4 \times (-3) = -10.2 \]
-        </div>
-
-        <h4>Step-by-step for Row 6 (x₁=3, x₂=0, y=−5.13)</h4>
-        <div class="formula-box accent4">
-          \[ h(x) = 0 + (-1)(3) + 1\cdot 0 = -3 \]
-          \[ \text{error} = -3 - (-5.13) = 2.13 \]
-          \[ \text{col}_0 = 2.13 \times 1 = 2.13 \]
-          \[ \text{col}_1 = 2.13 \times 3 = 6.39 \]
-          \[ \text{col}_2 = 2.13 \times 0 = 0 \]
-        </div>
-      </div>
-    </div>
-
-    <div class="step">
-      <div class="step-header">
-        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">2</div>
-        <h3>Sum the Gradient Columns &amp; Update Weights</h3>
-      </div>
-      <div class="step-body">
-        <h4>Total Gradient (sum each column):</h4>
-        <div class="formula-box accent4">
-          \[ \sum (h-y)x_0 = 3.4 + (-3.25) + (-5.5) + (-3.5) + (-4) + 2.13 = -10.72 \]
-          \[ \sum (h-y)x_1 = -3.4 + (-3.25) + (-5.5) + (-7) + 0 + 6.39 = -12.76 \]
-          \[ \sum (h-y)x_2 = -10.2 + (-3.25) + (-11) + (-7) + (-4) + 0 = -35.45 \]
-        </div>
-
-        <h4>Weight Update (Batch GD: divide by N=6, multiply by α=0.05):</h4>
-        <div class="formula-box accent4">
-          \[ w_j^{\text{new}} = w_j - \frac{\alpha}{N} \sum_i (h(x^{(i)}) - y^{(i)}) x_j^{(i)} \]
-          \[ w_0^{\text{new}} = 0 - \frac{0.05}{6} \times (-10.72) = 0 + 0.536 = 0.536 \]
-          \[ w_1^{\text{new}} = -1 - \frac{0.05}{6} \times (-12.76) = -1 + 0.638 \approx -0.362 \]
-          \[ w_2^{\text{new}} = 1 - \frac{0.05}{6} \times (-35.45) = 1 + 1.772 = 2.772 \]
+          \[ w_0 = 0 - 0.05 \times (-10.72) = 0 + 0.536 = \mathbf{0.536} \]
+          \[ w_1 = -1 - 0.05 \times (-12.76) = -1 + 0.638 = \mathbf{-0.362} \]
+          \[ w_2 = 1 - 0.05 \times (-35.45) = 1 + 1.7725 = \mathbf{2.772} \]
         </div>
 
         <div class="correction-box">
-          <div class="correction-title">⚡ Correction — WS Regression Score Issue</div>
-          <p style="color:var(--text-dim);font-size:13px;margin-bottom:12px;">The WS attempt shown with 65.82/100 had errors in the total gradient for \(w_0\). The reviewed attempt (96/100) shows the correct values. Here is what was wrong and what it should be:</p>
+          <div class="correction-title">✦ Error in 96/100 attempt — Q1a</div>
           <div class="fix-row">
-            <span class="fix-label">Question 1a — Total gradient \(\sum(h-y)x_0\) [marked wrong in attempt]</span>
-            <span class="fix-wrong">Submitted: 10.72</span>
-            <span class="fix-arrow">→</span>
-            <span class="fix-right">Correct: −10.72</span>
+            <span class="fix-label">Total gradient Σ₀ — submitted with wrong sign</span>
+            <span class="fix-wrong">+10.72</span><span class="fix-arrow">→</span><span class="fix-right">−10.72</span>
           </div>
-          <div class="fix-row">
-            <span class="fix-label">Question 1b Batch 1 — \(w_0\) after batch 1 [marked wrong]</span>
-            <span class="fix-wrong">Submitted: 0.007</span>
-            <span class="fix-arrow">→</span>
-            <span class="fix-right">Correct: see recalculation below</span>
-          </div>
-          <div class="fix-row">
-            <span class="fix-label">Question 1b — \(w_1\) after batch 2 [marked wrong]</span>
-            <span class="fix-wrong">Submitted: 0.326</span>
-            <span class="fix-arrow">→</span>
-            <span class="fix-right">Correct: see recalculation below</span>
-          </div>
-          <div class="fix-row">
-            <span class="fix-label">Question 1b Batch 1 — \(w_1\) after batch 1 [marked wrong]</span>
-            <span class="fix-wrong">Submitted: 0.667</span>
-            <span class="fix-arrow">→</span>
-            <span class="fix-right">Correct: see minibatch section</span>
-          </div>
+          <p style="font-size:12px;margin-top:6px;">The sum 3.4−3.25−5.5−3.5−4+2.13 = −10.72 (negative). All 3 final weights were still correct.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- Q1b Minibatch -->
+  <!-- Q1b MINIBATCH GD -->
   <div class="sub-q" style="margin-top:32px;">
-    <div class="sub-q-title">Question 1b — Minibatch Gradient Descent (batch size=2, lr=0.05, w=(0,−1,1))</div>
+    <div class="sub-q-title">Question 1b — Minibatch GD (batch=2, α=0.05, w=(0,−1,1))</div>
 
     <div class="step">
       <div class="step-header">
         <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">1</div>
-        <h3>Key Difference from Batch GD</h3>
+        <h3>Batch 1 — Samples 1 &amp; 2 — w=(0, −1, 1)</h3>
       </div>
       <div class="step-body">
         <div class="callout warn">
           <span class="callout-icon">⚡</span>
-          <p><strong>Critical:</strong> In minibatch GD, you update the weights after each mini-batch. So for Batch 2, you use the UPDATED weights from Batch 1 (not the original weights). Weights carry forward between mini-batches.</p>
+          <p><strong>Key rule:</strong> Update weights after EVERY batch of 2. Use the updated weights to compute h(x) in the next batch. Never reset to original weights.</p>
         </div>
-
-        <h4>Batch 1 (samples 1–2): w = (0, −1, 1)</h4>
+        <table class="calc-table">
+          <tr><th>No</th><th>x₁</th><th>x₂</th><th>y</th><th>h(x)</th><th>err×x₀</th><th>err×x₁</th><th>err×x₂</th></tr>
+          <tr><td>1</td><td>−1</td><td>−3</td><td>−5.4</td><td>−2</td><td>3.4</td><td>−3.4</td><td>−10.2</td></tr>
+          <tr><td>2</td><td>1</td><td>1</td><td>3.25</td><td>0</td><td>−3.25</td><td>−3.25</td><td>−3.25</td></tr>
+          <tr class="total-row"><td colspan="4">Σ</td><td>—</td><td>0.15</td><td>−6.65</td><td>−13.45</td></tr>
+        </table>
         <div class="formula-box accent4">
-          \[ \text{gradient sum from batch 1:} \]
-          \[ \sum(h-y)x_0 = 3.4 + (-3.25) = 0.15 \]
-          \[ \sum(h-y)x_1 = -3.4 + (-3.25) = -6.65 \]
-          \[ \sum(h-y)x_2 = -10.2 + (-3.25) = -13.45 \]
+          \[ w_0 = 0 - 0.05(0.15) = -0.0075 \approx \mathbf{-0.008} \]
+          \[ w_1 = -1 - 0.05(-6.65) = -1 + 0.3325 = \mathbf{-0.668} \]
+          \[ w_2 = 1 - 0.05(-13.45) = 1 + 0.6725 = \mathbf{1.673} \]
         </div>
-        <div class="formula-box accent4">
-          \[ w_0 = 0 - \frac{0.05}{2}(0.15) = 0 - 0.00375 \approx -0.004 \]
-          \[ w_1 = -1 - \frac{0.05}{2}(-6.65) = -1 + 0.16625 \approx -0.834 \]
-          \[ w_2 = 1 - \frac{0.05}{2}(-13.45) = 1 + 0.33625 \approx 1.336 \]
-        </div>
-
-        <div class="callout error-note">
-          <span class="callout-icon">❌</span>
-          <p><strong>Why w₀=0.007 and w₁=0.667 were wrong in the 65-score attempt:</strong> Those values suggest the student may have forgotten the \(1/N_{\text{batch}}\) division (using α=0.05 but not dividing by 2), or used wrong h(x) values. The correct update divides the gradient sum by the batch size before scaling by α.</p>
-        </div>
-
-        <h4>Batch 2 (samples 3–4): use UPDATED w from Batch 1</h4>
-        <p>With \(w = (-0.004, -0.834, 1.336)\), recompute h(x) for samples 3 and 4:</p>
-        <div class="formula-box accent4">
-          \[ h(x_3) = -0.004 + (-0.834)(1) + 1.336(2) = -0.004 - 0.834 + 2.672 = 1.834 \]
-          \[ h(x_4) = -0.004 + (-0.834)(2) + 1.336(2) = -0.004 - 1.668 + 2.672 = 1.000 \approx 1 \]
-        </div>
-        <p>Then recompute errors, gradients, and update again. Repeat for Batch 3 using those updated weights.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- Q3: Logistic Regression -->
-  <div class="sub-q" style="margin-top:32px;">
-    <div class="sub-q-title">Question 3 — Logistic Regression (Binary Classification)</div>
-
-    <div class="step">
-      <div class="step-header">
-        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">1</div>
-        <h3>Sigmoid Function — Replacing h(x) for Classification</h3>
-      </div>
-      <div class="step-body">
-        <p>For logistic regression, the prediction uses the <strong>sigmoid function</strong> applied to the linear combination:</p>
-        <div class="formula-box accent4">
-          \[ h(\mathbf{x}) = \sigma(\mathbf{w}^T\mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^T\mathbf{x}}} \]
-        </div>
-        <div class="legend">
-          <div class="legend-title">Symbol Legend</div>
-          <div class="legend-row"><span class="legend-sym">\(\sigma(\cdot)\)</span><span class="legend-def">Sigmoid function — maps any real number to (0,1), representing a probability</span></div>
-          <div class="legend-row"><span class="legend-sym">\(e^{-(\cdot)}\)</span><span class="legend-def">Exponential of the negated linear combination</span></div>
-          <div class="legend-row"><span class="legend-sym">\(h(\mathbf{x})\)</span><span class="legend-def">Predicted probability that sample x belongs to class 1</span></div>
-        </div>
-        <p>Example for sample 1 (x₁=1, x₂=2), w=(1,1,−1):</p>
-        <div class="formula-box accent4">
-          \[ \mathbf{w}^T\mathbf{x} = 1\cdot1 + 1\cdot1 + (-1)\cdot2 = 1 + 1 - 2 = 0 \]
-          \[ h(x) = \sigma(0) = \frac{1}{1+e^0} = \frac{1}{1+1} = 0.5 \]
+        <div class="correction-box">
+          <div class="correction-title">✦ Errors in 96/100 attempt — After Batch 1</div>
+          <div class="fix-row"><span class="fix-label">w₀ after Batch 1</span><span class="fix-wrong">+0.007</span><span class="fix-arrow">→</span><span class="fix-right">−0.008</span></div>
+          <div class="fix-row"><span class="fix-label">w₁ after Batch 1</span><span class="fix-wrong">+0.667</span><span class="fix-arrow">→</span><span class="fix-right">−0.668</span></div>
+          <p style="font-size:12px;margin-top:6px;">Both errors were wrong-sign. For w₀: 0 − 0.05×(+0.15) = −0.0075 (negative). For w₁: −1 + 0.3325 = −0.668 (still negative — starting from −1 and only adding 0.33 doesn't cross zero).</p>
         </div>
       </div>
     </div>
@@ -1197,69 +1084,144 @@
     <div class="step">
       <div class="step-header">
         <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">2</div>
-        <h3>Gradient for Logistic Regression — Same Form as Linear!</h3>
+        <h3>Batch 2 — Samples 3 &amp; 4 — Updated w=(−0.008, −0.668, 1.673)</h3>
       </div>
       <div class="step-body">
         <div class="formula-box accent4">
-          \[ \nabla_w L_i^{\text{logistic}} = (\sigma(\mathbf{w}^T\mathbf{x}^{(i)}) - y^{(i)}) \cdot \mathbf{x}^{(i)T} \]
+          \[ h(x_3):\; x_1=1, x_2=2 \Rightarrow -0.0075 + (-0.6675)(1) + 1.6725(2) = 2.670 \]
+          \[ h(x_4):\; x_1=2, x_2=2 \Rightarrow -0.0075 + (-0.6675)(2) + 1.6725(2) = 2.003 \]
+        </div>
+        <table class="calc-table">
+          <tr><th>No</th><th>x₁</th><th>x₂</th><th>y</th><th>h(x)</th><th>err×x₀</th><th>err×x₁</th><th>err×x₂</th></tr>
+          <tr><td>3</td><td>1</td><td>2</td><td>6.5</td><td>2.670</td><td>−3.830</td><td>−3.830</td><td>−7.660</td></tr>
+          <tr><td>4</td><td>2</td><td>2</td><td>3.5</td><td>2.003</td><td>−1.497</td><td>−2.994</td><td>−2.994</td></tr>
+          <tr class="total-row"><td colspan="4">Σ</td><td>—</td><td>−5.327</td><td>−6.824</td><td>−10.654</td></tr>
+        </table>
+        <div class="formula-box accent4">
+          \[ w_0 = -0.0075 - 0.05(-5.327) = -0.0075 + 0.2664 = \mathbf{0.259} \]
+          \[ w_1 = -0.6675 - 0.05(-6.824) = -0.6675 + 0.3412 = \mathbf{-0.326} \]
+          \[ w_2 = 1.6725 - 0.05(-10.654) = 1.6725 + 0.5327 = \mathbf{2.205} \]
+        </div>
+        <div class="correction-box">
+          <div class="correction-title">✦ Error in 96/100 attempt — After Batch 2</div>
+          <div class="fix-row"><span class="fix-label">w₁ after Batch 2 (wrong sign again)</span><span class="fix-wrong">+0.326</span><span class="fix-arrow">→</span><span class="fix-right">−0.326</span></div>
+          <p style="font-size:12px;margin-top:6px;">Starting from w₁=−0.6675 and adding +0.3412 gives −0.3263 — still negative. The answer is −0.326 not +0.326.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">3</div>
+        <h3>Batch 3 — Samples 5 &amp; 6 — Updated w=(0.259, −0.326, 2.205)</h3>
+      </div>
+      <div class="step-body">
+        <div class="formula-box accent4">
+          \[ h(x_5):\; x_1=0, x_2=1 \Rightarrow 0.2589 + (-0.3262)(0) + 2.2052(1) = 2.464 \]
+          \[ h(x_6):\; x_1=3, x_2=0 \Rightarrow 0.2589 + (-0.3262)(3) + 2.2052(0) = 0.2589 - 0.9786 = -0.720 \]
+        </div>
+        <table class="calc-table">
+          <tr><th>No</th><th>x₁</th><th>x₂</th><th>y</th><th>h(x)</th><th>err×x₀</th><th>err×x₁</th><th>err×x₂</th></tr>
+          <tr><td>5</td><td>0</td><td>1</td><td>5</td><td>2.464</td><td>−2.536</td><td>0</td><td>−2.536</td></tr>
+          <tr><td>6</td><td>3</td><td>0</td><td>−5.13</td><td>−0.720</td><td>4.410</td><td>13.230</td><td>0</td></tr>
+          <tr class="total-row"><td colspan="4">Σ</td><td>—</td><td>1.874</td><td>13.230</td><td>−2.536</td></tr>
+        </table>
+        <div class="formula-box accent4">
+          \[ w_0 = 0.2589 - 0.05(1.874) = 0.2589 - 0.0937 = \mathbf{0.165} \]
+          \[ w_1 = -0.3262 - 0.05(13.230) = -0.3262 - 0.6615 = \mathbf{-0.988} \]
+          \[ w_2 = 2.2052 - 0.05(-2.536) = 2.2052 + 0.1268 = \mathbf{2.332} \]
         </div>
         <div class="callout correct-note">
           <span class="callout-icon">✅</span>
-          <p><strong>Great news:</strong> The gradient formula for logistic regression (BCE loss) has the <strong>same structure</strong> as linear regression (SSE loss)! Just replace \(h(x)\) with \(\sigma(\mathbf{w}^T\mathbf{x})\). All table columns are computed identically.</p>
-        </div>
-
-        <h4>Complete Table for Q3 (w=(1,1,−1), lr=0.05)</h4>
-        <table class="calc-table">
-          <tr>
-            <th>No</th><th>\(x_1\)</th><th>\(x_2\)</th><th>y</th>
-            <th>\(h(x) = \sigma(\cdot)\)</th>
-            <th>\((h-y)x_0\)</th>
-            <th>\((h-y)x_1\)</th>
-            <th>\((h-y)x_2\)</th>
-          </tr>
-          <tr><td>1</td><td>1</td><td>2</td><td>1</td><td>0.5</td><td>−0.5</td><td>−0.5</td><td>−1</td></tr>
-          <tr><td>2</td><td>2</td><td>3</td><td>1</td><td>0.5</td><td>−0.5</td><td>−1</td><td>−1.5</td></tr>
-          <tr><td>3</td><td>2</td><td>2</td><td>1</td><td>0.731</td><td>−0.269</td><td>−0.538</td><td>−0.538</td></tr>
-          <tr><td>4</td><td>2.5</td><td>1</td><td>0</td><td>0.924</td><td>0.924</td><td>2.31</td><td>0.924</td></tr>
-          <tr><td>5</td><td>3</td><td>1</td><td>0</td><td>0.953</td><td>0.953</td><td>2.858</td><td>0.953</td></tr>
-          <tr><td>6</td><td>4</td><td>2</td><td>0</td><td>0.953</td><td>0.953</td><td>3.81</td><td>1.905</td></tr>
-          <tr class="total-row">
-            <td colspan="4">Total Gradient</td>
-            <td>—</td><td>1.56</td><td>6.94</td><td>0.744</td>
-          </tr>
-        </table>
-
-        <h4>Weight Update</h4>
-        <div class="formula-box accent4">
-          \[ w_0 = 1 - \frac{0.05}{6}(1.56) = 1 - 0.013 = 0.987 \approx 0.922 \]
-          \[ w_1 = 1 - \frac{0.05}{6}(6.94) = 1 - 0.347 = 0.653 \]
-          \[ w_2 = -1 - \frac{0.05}{6}(0.744) = -1 - 0.062 = -1.062 \approx -1.037 \]
-        </div>
-        <div class="callout correct-note">
-          <span class="callout-icon">✓</span>
-          <p>Question 3 was fully correct (34/34 marks). The WS table and weight updates match exactly.</p>
+          <p>Final weights after 1 epoch: w₀=0.165, w₁=−0.988, w₂=2.332 — all match the PDF ✓</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- General Tips -->
+  <!-- Q3 LOGISTIC REGRESSION -->
+  <div class="sub-q" style="margin-top:32px;">
+    <div class="sub-q-title">Question 3 — Logistic Regression Batch GD (α=0.05, w=(1,1,−1))</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">1</div>
+        <h3>Sigmoid Function — h(x) for Binary Classification</h3>
+      </div>
+      <div class="step-body">
+        <div class="formula-box accent4">
+          \[ h(\mathbf{x}) = \sigma(z) = \frac{1}{1+e^{-z}}, \quad z = w_0 + w_1 x_1 + w_2 x_2 \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(\sigma(\cdot)\)</span><span class="legend-def">Sigmoid — squashes z to (0,1), giving a probability</span></div>
+          <div class="legend-row"><span class="legend-sym">\(z\)</span><span class="legend-def">Linear combination w₀·1 + w₁·x₁ + w₂·x₂</span></div>
+          <div class="legend-row"><span class="legend-sym">\(e^{-z}\)</span><span class="legend-def">Euler's number to the power of −z</span></div>
+        </div>
+        <div class="callout correct-note">
+          <span class="callout-icon">✅</span>
+          <p>The gradient formula is identical to linear regression — just replace h(x) with σ(z). Table columns computed exactly the same way.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">2</div>
+        <h3>Full Table &amp; Weight Update</h3>
+      </div>
+      <div class="step-body">
+        <table class="calc-table">
+          <tr><th>No</th><th>x₁</th><th>x₂</th><th>y</th><th>z</th><th>h(x)=σ(z)</th><th>err×x₀</th><th>err×x₁</th><th>err×x₂</th></tr>
+          <tr><td>1</td><td>1</td><td>2</td><td>1</td><td>0</td><td>0.500</td><td>−0.500</td><td>−0.500</td><td>−1.000</td></tr>
+          <tr><td>2</td><td>2</td><td>3</td><td>1</td><td>0</td><td>0.500</td><td>−0.500</td><td>−1.000</td><td>−1.500</td></tr>
+          <tr><td>3</td><td>2</td><td>2</td><td>1</td><td>1</td><td>0.731</td><td>−0.269</td><td>−0.538</td><td>−0.538</td></tr>
+          <tr><td>4</td><td>2.5</td><td>1</td><td>0</td><td>2.5</td><td>0.924</td><td>0.924</td><td>2.310</td><td>0.924</td></tr>
+          <tr><td>5</td><td>3</td><td>1</td><td>0</td><td>3</td><td>0.953</td><td>0.953</td><td>2.858</td><td>0.953</td></tr>
+          <tr><td>6</td><td>4</td><td>2</td><td>0</td><td>3</td><td>0.953</td><td>0.953</td><td>3.810</td><td>1.905</td></tr>
+          <tr class="total-row"><td colspan="5">Total Σ</td><td class="correct-val">1.560</td><td class="correct-val">6.940</td><td class="correct-val">0.744</td></tr>
+        </table>
+        <h4>How to compute z for each row (w=(1,1,−1)):</h4>
+        <div class="formula-box accent4">
+          \[ z_1 = 1+1(1)+(-1)(2) = 0 \quad z_4 = 1+1(2.5)+(-1)(1) = 2.5 \quad z_5 = z_6 = 1+1(3)+(-1)(1) = 3 \]
+        </div>
+        <h4>Weight update: w_new = w − 0.05 × Σ</h4>
+        <div class="formula-box accent4">
+          \[ w_0 = 1 - 0.05(1.560) = 1 - 0.078 = \mathbf{0.922} \]
+          \[ w_1 = 1 - 0.05(6.940) = 1 - 0.347 = \mathbf{0.653} \]
+          \[ w_2 = -1 - 0.05(0.744) = -1 - 0.0372 = \mathbf{-1.037} \]
+        </div>
+        <div class="callout correct-note">
+          <span class="callout-icon">✅</span>
+          <p>Q3 was correct in all attempts — 34/34 marks ✓</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Summary -->
   <div class="step" style="margin-top:32px;">
     <div class="step-header">
       <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">★</div>
-      <h3>Summary Checklist — Common Mistakes to Avoid</h3>
+      <h3>Correction Summary — All 4 Wrong Answers Fixed</h3>
     </div>
     <div class="step-body">
+      <div class="correction-box">
+        <div class="correction-title">96/100 → 100/100: the 4 wrong answers and their fixes</div>
+        <div class="fix-row"><span class="fix-label">Q1a Σ₀ (sign error)</span><span class="fix-wrong">+10.72</span><span class="fix-arrow">→</span><span class="fix-right">−10.72</span></div>
+        <div class="fix-row"><span class="fix-label">Q1b w₀ after Batch 1 (sign error)</span><span class="fix-wrong">+0.007</span><span class="fix-arrow">→</span><span class="fix-right">−0.008</span></div>
+        <div class="fix-row"><span class="fix-label">Q1b w₁ after Batch 1 (sign error)</span><span class="fix-wrong">+0.667</span><span class="fix-arrow">→</span><span class="fix-right">−0.668</span></div>
+        <div class="fix-row"><span class="fix-label">Q1b w₁ after Batch 2 (sign error)</span><span class="fix-wrong">+0.326</span><span class="fix-arrow">→</span><span class="fix-right">−0.326</span></div>
+      </div>
       <div class="callout warn">
         <span class="callout-icon">📋</span>
         <div>
-          <p><strong>Before submitting any GD question, always verify:</strong></p>
-          <p>✓ Did you use x₀=1 for the bias column (not x₀=0)?</p>
-          <p>✓ Did you divide the total gradient by N_batch when updating weights?</p>
-          <p>✓ For minibatch GD: did you use the UPDATED weights for each new batch?</p>
-          <p>✓ Did you sum errors correctly (add negative numbers correctly)?</p>
-          <p>✓ For logistic regression: did you apply σ(z) = 1/(1+e^(−z)) to compute h(x)?</p>
-          <p>✓ For logistic regression: \(\mathbf{w}^T\mathbf{x} = w_0 + w_1 x_1 + w_2 x_2\) (not just w₁x₁+w₂x₂)</p>
+          <p><strong>All 4 errors had the same root cause: losing track of the sign of a weight.</strong></p>
+          <p>✓ When the gradient sum Σ is positive, subtracting α×Σ DECREASES the weight.</p>
+          <p>✓ When the gradient sum Σ is negative, subtracting α×Σ INCREASES the weight.</p>
+          <p>✓ A weight starting at −1 needs to gain more than 1.0 before it turns positive.</p>
+          <p>✓ Update rule = w − α×Σ (no division by N confirmed by the WS answers themselves).</p>
+          <p>✓ For minibatch GD: always use the most recently updated weights for h(x) in each new batch.</p>
         </div>
       </div>
     </div>
