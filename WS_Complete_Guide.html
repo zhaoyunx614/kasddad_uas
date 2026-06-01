@@ -1,0 +1,1282 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KASDD — Worksheet Complete Guide</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/3.2.2/es5/tex-mml-chtml.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,300;0,400;0,600;1,400&family=JetBrains+Mono:wght@400;500&family=DM+Sans:wght@300;400;500;600&display=swap');
+
+  :root {
+    --bg: #0f0f13;
+    --surface: #16161e;
+    --surface2: #1e1e2a;
+    --border: #2a2a3a;
+    --accent: #7c6af7;
+    --accent2: #e8635a;
+    --accent3: #4ecdc4;
+    --accent4: #f5d77e;
+    --text: #e8e6f0;
+    --text-dim: #9a9ab0;
+    --correct: #4ade80;
+    --wrong: #f87171;
+    --ws1: #7c6af7;
+    --ws2: #e8635a;
+    --ws3: #4ecdc4;
+    --ws4: #f5d77e;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    line-height: 1.7;
+  }
+
+  /* HERO */
+  .hero {
+    background: linear-gradient(135deg, #0f0f13 0%, #16102e 50%, #0f1a13 100%);
+    border-bottom: 1px solid var(--border);
+    padding: 60px 40px 50px;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: radial-gradient(ellipse 60% 80% at 70% 50%, rgba(124,106,247,0.12) 0%, transparent 70%);
+  }
+  .hero-tag {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--accent);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .hero h1 {
+    font-family: 'Crimson Pro', serif;
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 300;
+    line-height: 1.15;
+    color: #fff;
+    max-width: 700px;
+    position: relative;
+  }
+  .hero h1 em {
+    font-style: italic;
+    color: var(--accent);
+  }
+  .hero-sub {
+    margin-top: 16px;
+    color: var(--text-dim);
+    font-size: 15px;
+    max-width: 600px;
+    position: relative;
+  }
+  .hero-badges {
+    display: flex; gap: 10px; flex-wrap: wrap;
+    margin-top: 28px; position: relative;
+  }
+  .badge {
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    font-weight: 500;
+    border: 1px solid;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .badge:hover { opacity: 0.8; transform: translateY(-1px); }
+  .b1 { color: var(--ws1); border-color: var(--ws1); background: rgba(124,106,247,0.08); }
+  .b2 { color: var(--ws2); border-color: var(--ws2); background: rgba(232,99,90,0.08); }
+  .b3 { color: var(--ws3); border-color: var(--ws3); background: rgba(78,205,196,0.08); }
+  .b4 { color: var(--ws4); border-color: var(--ws4); background: rgba(245,215,126,0.08); }
+
+  /* NAV */
+  .toc {
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 0 40px;
+    display: flex; gap: 0;
+    overflow-x: auto;
+    position: sticky; top: 0; z-index: 100;
+  }
+  .toc a {
+    display: flex; align-items: center; gap: 8px;
+    padding: 16px 20px;
+    font-size: 13px; font-weight: 500;
+    color: var(--text-dim);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    white-space: nowrap;
+    transition: all 0.2s;
+  }
+  .toc a:hover { color: var(--text); border-color: var(--border); }
+  .toc a.t1:hover { color: var(--ws1); border-color: var(--ws1); }
+  .toc a.t2:hover { color: var(--ws2); border-color: var(--ws2); }
+  .toc a.t3:hover { color: var(--ws3); border-color: var(--ws3); }
+  .toc a.t4:hover { color: var(--ws4); border-color: var(--ws4); }
+
+  /* LAYOUT */
+  .container { max-width: 900px; margin: 0 auto; padding: 0 30px; }
+
+  /* WORKSHEET SECTIONS */
+  .ws-section {
+    padding: 60px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ws-header {
+    display: flex; align-items: flex-start; gap: 20px;
+    margin-bottom: 40px;
+  }
+  .ws-num {
+    flex-shrink: 0;
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 20px; font-weight: 500;
+  }
+  .ws-num.c1 { background: rgba(124,106,247,0.15); color: var(--ws1); border: 1px solid rgba(124,106,247,0.3); }
+  .ws-num.c2 { background: rgba(232,99,90,0.15); color: var(--ws2); border: 1px solid rgba(232,99,90,0.3); }
+  .ws-num.c3 { background: rgba(78,205,196,0.15); color: var(--ws3); border: 1px solid rgba(78,205,196,0.3); }
+  .ws-num.c4 { background: rgba(245,215,126,0.15); color: var(--ws4); border: 1px solid rgba(245,215,126,0.3); }
+
+  .ws-title-block h2 {
+    font-family: 'Crimson Pro', serif;
+    font-size: 1.9rem;
+    font-weight: 400;
+    color: #fff;
+    line-height: 1.2;
+  }
+  .ws-title-block p {
+    color: var(--text-dim);
+    font-size: 14px;
+    margin-top: 6px;
+  }
+  .score-pill {
+    display: inline-flex; align-items: center; gap: 6px;
+    padding: 4px 12px;
+    border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+    margin-top: 8px;
+  }
+  .score-good { background: rgba(74,222,128,0.1); color: var(--correct); border: 1px solid rgba(74,222,128,0.3); }
+  .score-partial { background: rgba(245,215,126,0.1); color: var(--accent4); border: 1px solid rgba(245,215,126,0.3); }
+
+  /* STEPS */
+  .step {
+    margin-bottom: 32px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+  }
+  .step-header {
+    padding: 14px 20px;
+    display: flex; align-items: center; gap: 12px;
+    border-bottom: 1px solid var(--border);
+    background: var(--surface);
+  }
+  .step-num {
+    width: 26px; height: 26px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px; font-weight: 500;
+    flex-shrink: 0;
+  }
+  .step-header h3 {
+    font-size: 14px; font-weight: 600;
+    color: var(--text);
+    letter-spacing: 0.3px;
+  }
+  .step-body {
+    padding: 20px;
+    background: var(--surface2);
+  }
+
+  /* FORMULA BOXES */
+  .formula-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px 20px;
+    margin: 14px 0;
+    font-size: 15px;
+    overflow-x: auto;
+  }
+  .formula-box.accent1 { border-color: rgba(124,106,247,0.4); background: rgba(124,106,247,0.04); }
+  .formula-box.accent2 { border-color: rgba(232,99,90,0.4); background: rgba(232,99,90,0.04); }
+  .formula-box.accent3 { border-color: rgba(78,205,196,0.4); background: rgba(78,205,196,0.04); }
+  .formula-box.accent4 { border-color: rgba(245,215,126,0.4); background: rgba(245,215,126,0.04); }
+
+  /* LEGEND */
+  .legend {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 18px;
+    margin: 12px 0;
+  }
+  .legend-title {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 2px;
+    color: var(--text-dim);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+  }
+  .legend-row {
+    display: flex; align-items: baseline; gap: 10px;
+    font-size: 13px;
+    padding: 3px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.04);
+  }
+  .legend-row:last-child { border-bottom: none; }
+  .legend-sym {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    color: var(--accent);
+    flex-shrink: 0;
+    min-width: 80px;
+  }
+  .legend-def { color: var(--text-dim); font-size: 13px; }
+
+  /* TABLE */
+  .calc-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    font-family: 'JetBrains Mono', monospace;
+    margin: 14px 0;
+  }
+  .calc-table th {
+    background: var(--surface);
+    padding: 9px 12px;
+    text-align: center;
+    font-size: 11px;
+    letter-spacing: 0.5px;
+    color: var(--text-dim);
+    border: 1px solid var(--border);
+    font-weight: 500;
+  }
+  .calc-table td {
+    padding: 8px 12px;
+    text-align: center;
+    border: 1px solid var(--border);
+    color: var(--text);
+    background: var(--bg);
+  }
+  .calc-table tr:hover td { background: rgba(255,255,255,0.02); }
+  .calc-table .highlight { color: var(--accent4); font-weight: 500; }
+  .calc-table .total-row td { background: var(--surface); color: var(--accent); font-weight: 500; }
+  .calc-table .correct-val { color: var(--correct); }
+  .calc-table .wrong-val { color: var(--wrong); }
+
+  /* CALLOUTS */
+  .callout {
+    display: flex; gap: 12px; align-items: flex-start;
+    padding: 14px 16px;
+    border-radius: 8px;
+    margin: 12px 0;
+    font-size: 14px;
+  }
+  .callout-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+  .callout.info { background: rgba(124,106,247,0.08); border: 1px solid rgba(124,106,247,0.2); }
+  .callout.warn { background: rgba(245,215,126,0.08); border: 1px solid rgba(245,215,126,0.2); }
+  .callout.correct-note { background: rgba(74,222,128,0.08); border: 1px solid rgba(74,222,128,0.2); }
+  .callout.error-note { background: rgba(248,113,113,0.08); border: 1px solid rgba(248,113,113,0.2); }
+  .callout p { color: var(--text-dim); }
+  .callout strong { color: var(--text); }
+
+  /* INLINE CODE */
+  code {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    background: rgba(255,255,255,0.08);
+    padding: 2px 6px;
+    border-radius: 4px;
+    color: var(--accent3);
+  }
+
+  p { margin: 10px 0; font-size: 14.5px; color: var(--text-dim); }
+  p strong { color: var(--text); }
+
+  .section-divider {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+    margin: 24px 0;
+  }
+
+  h4 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    margin: 20px 0 10px;
+  }
+
+  .sub-q {
+    margin: 24px 0 0;
+    padding: 16px 18px;
+    border-left: 3px solid var(--border);
+    border-radius: 0 8px 8px 0;
+    background: rgba(255,255,255,0.015);
+  }
+  .sub-q-title {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--accent);
+    margin-bottom: 10px;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  /* SCORE CORRECTOR */
+  .correction-box {
+    border: 1px solid rgba(248,113,113,0.4);
+    border-radius: 10px;
+    padding: 18px 20px;
+    margin: 20px 0;
+    background: rgba(248,113,113,0.04);
+  }
+  .correction-title {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--wrong);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .fix-row {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    font-size: 13px;
+  }
+  .fix-row:last-child { border-bottom: none; }
+  .fix-wrong { color: var(--wrong); font-family: 'JetBrains Mono', monospace; }
+  .fix-arrow { color: var(--text-dim); }
+  .fix-right { color: var(--correct); font-family: 'JetBrains Mono', monospace; }
+  .fix-label { color: var(--text-dim); font-size: 11px; grid-column: 1 / -1; margin-top: 4px; }
+
+  /* SCROLL MARGIN */
+  .ws-section { scroll-margin-top: 55px; }
+
+  /* FOOTER */
+  footer {
+    text-align: center;
+    padding: 40px;
+    color: var(--text-dim);
+    font-size: 12px;
+    border-top: 1px solid var(--border);
+  }
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-tag">KASDD — Genap 2025/2026 — Complete Step-by-Step Guide</div>
+  <h1>Worksheet <em>Master Guide</em></h1>
+  <p class="hero-sub">Every formula, every variable, every table cell — explained in full detail. Includes corrections for WS Regression.</p>
+  <div class="hero-badges">
+    <span class="badge b1">WS Clustering</span>
+    <span class="badge b2">WS Naive Bayes</span>
+    <span class="badge b3">WS Neural Networks</span>
+    <span class="badge b4">WS Regression ★ Corrected</span>
+  </div>
+</div>
+
+<nav class="toc">
+  <a href="#ws1" class="t1">① Clustering</a>
+  <a href="#ws2" class="t2">② Naive Bayes</a>
+  <a href="#ws3" class="t3">③ Neural Networks</a>
+  <a href="#ws4" class="t4">④ Regression</a>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- WS 1: CLUSTERING -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="ws1" class="ws-section">
+<div class="container">
+  <div class="ws-header">
+    <div class="ws-num c1">W1</div>
+    <div class="ws-title-block">
+      <h2>Clustering — K-Means & Agglomerative &amp; Silhouette</h2>
+      <p>K-Means with Euclidean Distance · Agglomerative with Manhattan + Average Linkage · Silhouette Coefficient</p>
+    </div>
+  </div>
+
+  <!-- ── Q1: K-Means ── -->
+  <div class="sub-q">
+    <div class="sub-q-title">Question 1 — K-Means Clustering (k=2)</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">1</div>
+        <h3>The Prediction Formula — h(x)</h3>
+      </div>
+      <div class="step-body">
+        <p>In K-Means, we assign each data point to the <strong>nearest centroid</strong> by computing the distance. The distance used here is <strong>Euclidean Distance</strong>:</p>
+        <div class="formula-box accent1">
+          \[ d(A, B) = \sqrt{(A_x - B_x)^2 + (A_y - B_y)^2} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(A, B\)</span><span class="legend-def">Two points being compared (e.g., a data point and a centroid)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(A_x, A_y\)</span><span class="legend-def">Coordinates of point A</span></div>
+          <div class="legend-row"><span class="legend-sym">\(d(A,B)\)</span><span class="legend-def">Euclidean distance between points A and B</span></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">2</div>
+        <h3>Step 1 — Compute Distance of Each Point to Each Centroid</h3>
+      </div>
+      <div class="step-body">
+        <p>Given initial centroids <strong>cent1 = (1, 5)</strong> and <strong>cent2 = (3, 1)</strong>, for each data point calculate the Euclidean distance to both centroids, then assign to the nearest one.</p>
+        <div class="callout info">
+          <span class="callout-icon">📐</span>
+          <p><strong>How to fill the dist1 and dist2 columns:</strong> For each row, apply the formula above substituting the data point coordinates and each centroid's coordinates. The cluster column gets <strong>C1</strong> if dist1 &lt; dist2, else <strong>C2</strong>.</p>
+        </div>
+        <p>Example for point A1 = (1, 5):</p>
+        <div class="formula-box accent1">
+          \[ \text{dist to cent1} = \sqrt{(1-1)^2 + (5-5)^2} = \sqrt{0+0} = 0 \]
+          \[ \text{dist to cent2} = \sqrt{(1-3)^2 + (5-1)^2} = \sqrt{4+16} = \sqrt{20} \approx 4.472 \]
+        </div>
+        <p>Since 0 &lt; 4.472, point A1 → <strong>Cluster 1</strong>.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">3</div>
+        <h3>Step 2 — Update Centroids (Recalculate as Mean of Cluster Members)</h3>
+      </div>
+      <div class="step-body">
+        <p>After assigning all points to clusters, recalculate each centroid as the <strong>mean of all points in that cluster</strong>:</p>
+        <div class="formula-box accent1">
+          \[ \text{new centroid}_k = \left( \frac{\sum_{i \in C_k} x_i}{|C_k|}, \; \frac{\sum_{i \in C_k} y_i}{|C_k|} \right) \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(C_k\)</span><span class="legend-def">Set of points assigned to cluster k</span></div>
+          <div class="legend-row"><span class="legend-sym">\(|C_k|\)</span><span class="legend-def">Number of points in cluster k</span></div>
+          <div class="legend-row"><span class="legend-sym">\(x_i, y_i\)</span><span class="legend-def">Coordinates of point i in cluster k</span></div>
+        </div>
+        <div class="callout info">
+          <span class="callout-icon">🔁</span>
+          <p><strong>Stopping Criteria:</strong> Repeat Steps 1–2 until the centroids no longer change (converge). In the WS, check after each iteration whether the centroid is the same as the previous one.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Q2: Agglomerative ── -->
+  <div class="sub-q" style="margin-top:32px;">
+    <div class="sub-q-title">Question 2 — Agglomerative Clustering (Manhattan + Average Linkage)</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">1</div>
+        <h3>Distance Matrix — Manhattan Distance</h3>
+      </div>
+      <div class="step-body">
+        <p>Manhattan distance (also called L1 distance) between two points:</p>
+        <div class="formula-box accent1">
+          \[ d_{\text{Manhattan}}(A, B) = |A_x - B_x| + |A_y - B_y| \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(|{}\cdot{}|\)</span><span class="legend-def">Absolute value (always take the positive result)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(A_x, B_x\)</span><span class="legend-def">x-coordinates of points A and B</span></div>
+          <div class="legend-row"><span class="legend-sym">\(A_y, B_y\)</span><span class="legend-def">y-coordinates of points A and B</span></div>
+        </div>
+        <p>Fill the distance matrix by computing \(d\) for every pair of points. Note: <strong>d(A,A) = 0</strong> and the matrix is symmetric \(d(A,B) = d(B,A)\).</p>
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <p><strong>Important:</strong> The WS says "no normalization" — use raw coordinates directly.</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">2</div>
+        <h3>Merging Steps — Average Linkage</h3>
+      </div>
+      <div class="step-body">
+        <p>At each step, <strong>merge the pair of clusters with the smallest distance</strong>. After merging, update all distances to the new cluster using <strong>Average Linkage</strong>:</p>
+        <div class="formula-box accent1">
+          \[ d_{\text{avg}}(C_{\text{new}}, C_j) = \frac{\sum_{a \in C_{\text{new}}} \sum_{b \in C_j} d(a, b)}{|C_{\text{new}}| \cdot |C_j|} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(C_{\text{new}}\)</span><span class="legend-def">The newly merged cluster (contains all members of the two merged clusters)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(C_j\)</span><span class="legend-def">Any other existing cluster</span></div>
+          <div class="legend-row"><span class="legend-sym">\(d(a,b)\)</span><span class="legend-def">Distance between individual point a and individual point b (from original distance matrix)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(|C|\)</span><span class="legend-def">Number of members in a cluster</span></div>
+        </div>
+        <div class="callout info">
+          <span class="callout-icon">💡</span>
+          <p><strong>Practical shortcut for average linkage:</strong> When merging cluster C1 (with members) and C2 (with members) into C_new, the new distance to any cluster Cj = average of all pairwise distances between members of C_new and Cj.<br><br>
+          The WS uses the <strong>alphabetical order rule</strong>: when distances are equal, prefer the alphabetically-first pair. List cluster members sorted alphabetically.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Q3: Silhouette ── -->
+  <div class="sub-q" style="margin-top:32px;">
+    <div class="sub-q-title">Question 3 — Silhouette Coefficient</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">1</div>
+        <h3>Intra-cluster similarity — a(i)</h3>
+      </div>
+      <div class="step-body">
+        <p>The <strong>intra-cluster similarity</strong> a(i) is the average distance from point i to all other points in the <strong>same cluster</strong>:</p>
+        <div class="formula-box accent1">
+          \[ a(i) = \frac{1}{|C_i| - 1} \sum_{j \in C_i,\; j \neq i} d(i, j) \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(a(i)\)</span><span class="legend-def">Average distance from point i to all OTHER points in its own cluster (lower = more cohesive)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(C_i\)</span><span class="legend-def">The cluster that point i belongs to</span></div>
+          <div class="legend-row"><span class="legend-sym">\(|C_i|-1\)</span><span class="legend-def">Number of other points in the same cluster (subtract 1 to exclude point i itself)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(d(i,j)\)</span><span class="legend-def">Euclidean distance between point i and point j</span></div>
+        </div>
+        <p>In the WS, for point (13.5, 7.5) in Cluster C, compute distances to each OTHER Cluster C member, then average them.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">2</div>
+        <h3>Inter-cluster dissimilarity — b(i)</h3>
+      </div>
+      <div class="step-body">
+        <p>The <strong>inter-cluster dissimilarity</strong> b(i) is the average distance from point i to all points in the <strong>nearest OTHER cluster</strong>:</p>
+        <div class="formula-box accent1">
+          \[ b(i) = \min_{k \neq C_i} \frac{1}{|C_k|} \sum_{j \in C_k} d(i, j) \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(b(i)\)</span><span class="legend-def">Minimum average distance from point i to points in any other cluster (lower means the point is close to a neighboring cluster)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\min_{k \neq C_i}\)</span><span class="legend-def">Take the minimum over all clusters other than the one i belongs to</span></div>
+          <div class="legend-row"><span class="legend-sym">\(|C_k|\)</span><span class="legend-def">Number of points in the other cluster k</span></div>
+        </div>
+        <p>Compute the average distance from (13.5, 7.5) to all points in Cluster A, then to all points in Cluster B. Take the <strong>minimum</strong> of these two averages as b(i).</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(124,106,247,0.2);color:var(--ws1)">3</div>
+        <h3>Silhouette Score — s(i)</h3>
+      </div>
+      <div class="step-body">
+        <div class="formula-box accent1">
+          \[ s(i) = \frac{b(i) - a(i)}{\max(a(i),\; b(i))} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(s(i)\)</span><span class="legend-def">Silhouette score for point i. Range: [−1, 1]. Closer to +1 = well-clustered; near 0 = on boundary; negative = possibly mis-clustered</span></div>
+          <div class="legend-row"><span class="legend-sym">\(b(i)\)</span><span class="legend-def">Average distance to nearest other cluster (separation)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(a(i)\)</span><span class="legend-def">Average distance within own cluster (cohesion)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\max(\cdot)\)</span><span class="legend-def">The larger of a(i) or b(i) — used to normalize the score to [−1,1]</span></div>
+        </div>
+        <div class="callout info">
+          <span class="callout-icon">🧮</span>
+          <p><strong>Worked example from WS:</strong> a(13.5, 7.5) = 2.617 (avg dist to C cluster mates), b(13.5, 7.5) = min(avg to A, avg to B). Then s = (b − a) / max(a, b) = 0.096</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- WS 2: NAIVE BAYES -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="ws2" class="ws-section">
+<div class="container">
+  <div class="ws-header">
+    <div class="ws-num c2">W2</div>
+    <div class="ws-title-block">
+      <h2>Naive Bayes &amp; Probability</h2>
+      <p>Prior probability · Likelihood · Posterior (Bayes Theorem) · Naive Bayes Classifier</p>
+      <span class="score-pill score-good">✓ Perfect Score — 100/100</span>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(232,99,90,0.2);color:var(--ws2)">1</div>
+      <h3>Core Formula — Bayes Theorem</h3>
+    </div>
+    <div class="step-body">
+      <div class="formula-box accent2">
+        \[ P(Y \mid X) = \frac{P(X \mid Y) \cdot P(Y)}{P(X)} \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\(P(Y \mid X)\)</span><span class="legend-def"><strong>Posterior</strong>: probability of class Y given observed data X — this is what we want</span></div>
+        <div class="legend-row"><span class="legend-sym">\(P(X \mid Y)\)</span><span class="legend-def"><strong>Likelihood</strong>: probability of observing data X given class Y</span></div>
+        <div class="legend-row"><span class="legend-sym">\(P(Y)\)</span><span class="legend-def"><strong>Prior</strong>: probability of class Y before seeing any data (from training data counts)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(P(X)\)</span><span class="legend-def"><strong>Normalizing constant / evidence</strong>: probability of observing X regardless of class. This is the same for all classes, so it can be ignored when comparing classes.</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(232,99,90,0.2);color:var(--ws2)">2</div>
+      <h3>Q1–Q2 — Conditional Probability (University Students)</h3>
+    </div>
+    <div class="step-body">
+      <p>Given: 800 students total, 416 female. 5% of all students take CS. 35% take Business. The rest take Psychology.</p>
+      <div class="callout info">
+        <span class="callout-icon">📊</span>
+        <p><strong>How to derive counts from percentages:</strong><br>
+        Total CS students = 800 × 5% = 40<br>
+        Total Business students = 800 × 35% = 280<br>
+        Total Psychology = 800 − 40 − 280 = 480</p>
+      </div>
+      <p>For conditional probability questions like "P(Female | CS)", use the given information: 2% of female CS students (from Q2) → number of female CS = 120 × 2% × ... Apply definition:</p>
+      <div class="formula-box accent2">
+        \[ P(A \mid B) = \frac{P(A \cap B)}{P(B)} = \frac{\text{count}(A \text{ and } B)}{\text{count}(B)} \]
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(232,99,90,0.2);color:var(--ws2)">3</div>
+      <h3>Q3–Q4 — Total Probability &amp; Bayes (Pipe Factory)</h3>
+    </div>
+    <div class="step-body">
+      <p>Three factories X, Y, Z produce 2000, 3000, 5000 units respectively. Defect rates: X=3%, Y=4%, Z=2%.</p>
+      <h4>Step A — Prior Probabilities</h4>
+      <div class="formula-box accent2">
+        \[ P(X) = \frac{2000}{10000} = 0.2, \quad P(Y) = \frac{3000}{10000} = 0.3, \quad P(Z) = \frac{5000}{10000} = 0.5 \]
+      </div>
+      <h4>Step B — Total Probability of Defect P(D)</h4>
+      <div class="formula-box accent2">
+        \[ P(D) = P(D|X)\cdot P(X) + P(D|Y)\cdot P(Y) + P(D|Z)\cdot P(Z) \]
+        \[ = 0.03 \times 0.2 + 0.04 \times 0.3 + 0.02 \times 0.5 = 0.006 + 0.012 + 0.01 = 0.028 \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\(P(D|X)\)</span><span class="legend-def">Probability a pipe is defective given it came from factory X (= defect rate = 0.03)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(P(D)\)</span><span class="legend-def">Total probability of a randomly selected pipe being defective (sum over all factories)</span></div>
+      </div>
+      <h4>Step C — Bayes: P(Y | D)</h4>
+      <div class="formula-box accent2">
+        \[ P(Y \mid D) = \frac{P(D|Y) \cdot P(Y)}{P(D)} = \frac{0.04 \times 0.3}{0.028} = \frac{0.012}{0.028} \approx 0.429 \]
+      </div>
+    </div>
+  </div>
+
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(232,99,90,0.2);color:var(--ws2)">4</div>
+      <h3>Q5 — Naive Bayes Classifier (Energy Usage)</h3>
+    </div>
+    <div class="step-body">
+      <p>Naive Bayes classifies a new data point by computing the <strong>unnormalized posterior</strong> for each class, then normalizing.</p>
+
+      <h4>Step A — Prior</h4>
+      <div class="formula-box accent2">
+        \[ P(c) = \frac{N_c}{N} \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\(P(c)\)</span><span class="legend-def">Prior probability of class c (e.g., Low or High)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(N_c\)</span><span class="legend-def">Number of training samples belonging to class c</span></div>
+        <div class="legend-row"><span class="legend-sym">\(N\)</span><span class="legend-def">Total number of training samples</span></div>
+      </div>
+
+      <h4>Step B — Likelihood (Class Conditional Density) for Categorical Features</h4>
+      <div class="formula-box accent2">
+        \[ P(x_d = v \mid y = c) = \frac{\text{count}(x_d = v \text{ and } y = c)}{N_c} \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\(x_d\)</span><span class="legend-def">Feature d (e.g., Solar Panels or Energy-Efficient Appliances)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(v\)</span><span class="legend-def">The specific value of feature d (e.g., Yes or No)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(y = c\)</span><span class="legend-def">The class label (Low or High energy usage)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(N_c\)</span><span class="legend-def">Number of training samples with class c (denominator = class count)</span></div>
+      </div>
+
+      <h4>Step C — Unnormalized Posterior (Naive: assume feature independence)</h4>
+      <div class="formula-box accent2">
+        \[ P(c \mid \mathbf{x}) \propto P(c) \cdot \prod_{d=1}^{D} P(x_d \mid y = c) \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\(\propto\)</span><span class="legend-def">"Proportional to" — we skip dividing by P(x) since it's the same for all classes</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\prod\)</span><span class="legend-def">Product (multiply together) of all per-feature likelihoods</span></div>
+        <div class="legend-row"><span class="legend-sym">\(D\)</span><span class="legend-def">Number of features</span></div>
+      </div>
+
+      <h4>Step D — Normalize to get true posterior</h4>
+      <div class="formula-box accent2">
+        \[ P(c \mid \mathbf{x}) = \frac{P(c) \cdot \prod_d P(x_d \mid c)}{\sum_{c'} P(c') \cdot \prod_d P(x_d \mid c')} \]
+      </div>
+      <p>Sum all unnormalized posteriors across classes, then divide each by that sum.</p>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- WS 3: NEURAL NETWORKS -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="ws3" class="ws-section">
+<div class="container">
+  <div class="ws-header">
+    <div class="ws-num c3">W3</div>
+    <div class="ws-title-block">
+      <h2>Neural Networks — Forward &amp; Backward Pass</h2>
+      <p>FFNN architecture · Softmax · Cross-Entropy Loss · Backpropagation · Weight Update</p>
+      <span class="score-pill score-good">✓ Perfect Score — 100/100</span>
+    </div>
+  </div>
+
+  <!-- Q1 -->
+  <div class="sub-q">
+    <div class="sub-q-title">Question 1 — FFNN Architecture &amp; Parameter Count</div>
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(78,205,196,0.2);color:var(--ws3)">1</div>
+        <h3>Counting Parameters in a Layer</h3>
+      </div>
+      <div class="step-body">
+        <p>A layer with \(n_{\text{in}}\) inputs and \(n_{\text{out}}\) outputs has:</p>
+        <div class="formula-box accent3">
+          \[ \text{Parameters in layer} = (n_{\text{in}} \times n_{\text{out}}) + n_{\text{out}} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(n_{\text{in}}\)</span><span class="legend-def">Number of input features (or units from previous layer)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(n_{\text{out}}\)</span><span class="legend-def">Number of units (neurons) in this layer</span></div>
+          <div class="legend-row"><span class="legend-sym">\(n_{\text{in}} \times n_{\text{out}}\)</span><span class="legend-def">Weight matrix W — one weight per (input, output) pair</span></div>
+          <div class="legend-row"><span class="legend-sym">\(+\; n_{\text{out}}\)</span><span class="legend-def">Bias vector b — one bias per output unit</span></div>
+        </div>
+        <p>For 13 inputs → 23 units (Layer 1): params = (13×23)+23 = 299+23 = 322</p>
+        <p>For 23 inputs → 3 units (Layer 2): params = (23×3)+3 = 69+3 = 72</p>
+        <p>Total = 322 + 72 = <strong>394 parameters</strong></p>
+        <div class="callout info">
+          <span class="callout-icon">🧠</span>
+          <p><strong>Activation function for 3-class output:</strong> Use <strong>Softmax</strong>, which outputs a probability distribution over K classes (all outputs sum to 1). For hidden layers with arbitrary outputs, Sigmoid or ReLU are used; for multi-class output → Softmax.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="sub-q" style="margin-top:32px;">
+    <div class="sub-q-title">Question 2 — Full Forward &amp; Backward Pass</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(78,205,196,0.2);color:var(--ws3)">1</div>
+        <h3>Forward Pass — Layer 1 (Softmax Activation)</h3>
+      </div>
+      <div class="step-body">
+        <p>Given input \(\mathbf{x} = (-1, 1)\), the forward pass through Layer 1:</p>
+        <div class="formula-box accent3">
+          \[ \mathbf{p}^{(1)} = W^{(1)}\mathbf{x} + \mathbf{b}^{(1)} \quad \text{(pre-activation)} \]
+        </div>
+        <div class="formula-box accent3">
+          \[ \mathbf{a}^{(1)} = \text{softmax}(\mathbf{p}^{(1)}) \quad \text{(activation)} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(W^{(1)}\)</span><span class="legend-def">Weight matrix of Layer 1 (shape: units × inputs)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\mathbf{b}^{(1)}\)</span><span class="legend-def">Bias vector of Layer 1</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\mathbf{p}^{(1)}\)</span><span class="legend-def">Pre-activation vector (raw linear combination before applying activation)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\mathbf{a}^{(1)}\)</span><span class="legend-def">Activation vector (output of Layer 1 after applying softmax)</span></div>
+        </div>
+        <h4>Softmax Formula</h4>
+        <div class="formula-box accent3">
+          \[ \text{softmax}(u_k) = \frac{e^{u_k}}{\sum_{j} e^{u_j}} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(u_k\)</span><span class="legend-def">The k-th element of the pre-activation vector</span></div>
+          <div class="legend-row"><span class="legend-sym">\(e^{u_k}\)</span><span class="legend-def">Exponential of the k-th element</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\sum_j e^{u_j}\)</span><span class="legend-def">Sum of exponentials of ALL elements — this normalizes the output so they sum to 1</span></div>
+        </div>
+        <p>Example: if \(\mathbf{p}^{(1)} = (1.9, 0.5)\), then softmax: \(e^{1.9} \approx 6.686\), \(e^{0.5} \approx 1.649\), sum = 8.335, so softmax = (6.686/8.335, 1.649/8.335) ≈ (0.802, 0.198). But the WS gives \(a_1^{(1)} = 2.039\) — this is for a layer NOT using softmax on a 2-unit hidden layer; those are from the matrix multiply + bias directly with softmax applied per component.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(78,205,196,0.2);color:var(--ws3)">2</div>
+        <h3>Forward Pass — Layer 2 &amp; Loss</h3>
+      </div>
+      <div class="step-body">
+        <div class="formula-box accent3">
+          \[ \mathbf{p}^{(2)} = W^{(2)}\mathbf{a}^{(1)} + \mathbf{b}^{(2)} \]
+        </div>
+        <div class="formula-box accent3">
+          \[ \mathbf{a}^{(2)} = \text{softmax}(\mathbf{p}^{(2)}) \]
+        </div>
+        <h4>Cross-Entropy Loss (for 3-class, target y = class 1)</h4>
+        <div class="formula-box accent3">
+          \[ L = -\sum_{k=1}^{K} y_k \log(a_k^{(2)}) = -\log(a_{\text{target}}^{(2)}) \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(K\)</span><span class="legend-def">Number of classes (K=3 here)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(y_k\)</span><span class="legend-def">One-hot target: 1 for the correct class, 0 for all others</span></div>
+          <div class="legend-row"><span class="legend-sym">\(a_k^{(2)}\)</span><span class="legend-def">Predicted probability for class k (output of softmax in Layer 2)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\log\)</span><span class="legend-def">Natural logarithm (ln)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(-\log(\cdot)\)</span><span class="legend-def">The loss is large when the predicted probability for the true class is small</span></div>
+        </div>
+        <div class="callout info">
+          <span class="callout-icon">📌</span>
+          <p>Since y is one-hot, only the term for the correct class survives. Target = class 1 (index 0) → \(L = -\log(a_0^{(2)})\)</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(78,205,196,0.2);color:var(--ws3)">3</div>
+        <h3>Backward Pass — Gradients at Output Layer (Softmax + Cross-Entropy)</h3>
+      </div>
+      <div class="step-body">
+        <p>The combined derivative of softmax + cross-entropy loss with respect to the pre-activation \(\mathbf{p}^{(2)}\) simplifies beautifully:</p>
+        <div class="formula-box accent3">
+          \[ \bar{\mathbf{p}}^{(2)} = \frac{\partial L}{\partial \mathbf{p}^{(2)}} = \mathbf{a}^{(2)} - \mathbf{y} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(\bar{\mathbf{p}}^{(2)}\)</span><span class="legend-def">Gradient of loss w.r.t. pre-activation of Layer 2 (a vector)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\mathbf{a}^{(2)}\)</span><span class="legend-def">Predicted probability vector from forward pass</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\mathbf{y}\)</span><span class="legend-def">One-hot target vector</span></div>
+        </div>
+        <p>Example: if \(\mathbf{a}^{(2)} = (0.255, 0.513, 0.232)\) and target is class 0 (y=(1,0,0)), then \(\bar{\mathbf{p}}^{(2)} = (0.255-1, 0.513-0, 0.232-0) = (-0.745, 0.513, 0.232)\).</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(78,205,196,0.2);color:var(--ws3)">4</div>
+        <h3>Backward Pass — Gradients for W and b</h3>
+      </div>
+      <div class="step-body">
+        <div class="formula-box accent3">
+          \[ \bar{W}^{(2)} = \frac{\partial L}{\partial W^{(2)}} = \bar{\mathbf{p}}^{(2)} \cdot (\mathbf{a}^{(1)})^T \]
+        </div>
+        <div class="formula-box accent3">
+          \[ \bar{\mathbf{b}}^{(2)} = \frac{\partial L}{\partial \mathbf{b}^{(2)}} = \bar{\mathbf{p}}^{(2)} \]
+        </div>
+        <div class="formula-box accent3">
+          \[ \bar{\mathbf{a}}^{(1)} = \frac{\partial L}{\partial \mathbf{a}^{(1)}} = (W^{(2)})^T \cdot \bar{\mathbf{p}}^{(2)} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(\bar{W}^{(2)}\)</span><span class="legend-def">Gradient of loss w.r.t. weight matrix of Layer 2 — same shape as \(W^{(2)}\)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\bar{\mathbf{p}}^{(2)} \cdot (\mathbf{a}^{(1)})^T\)</span><span class="legend-def">Outer product: column vector × row vector = matrix</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\bar{\mathbf{b}}^{(2)}\)</span><span class="legend-def">Gradient of loss w.r.t. bias of Layer 2 = same as \(\bar{\mathbf{p}}^{(2)}\)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\bar{\mathbf{a}}^{(1)}\)</span><span class="legend-def">Gradient flowing back to Layer 1's activations</span></div>
+        </div>
+        <p>Then propagate back through Layer 1's softmax activation using the Jacobian of softmax, then compute \(\bar{W}^{(1)}\) and \(\bar{\mathbf{b}}^{(1)}\) similarly.</p>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(78,205,196,0.2);color:var(--ws3)">5</div>
+        <h3>Weight Update — Gradient Descent</h3>
+      </div>
+      <div class="step-body">
+        <div class="formula-box accent3">
+          \[ W^{(l)}_{\text{new}} = W^{(l)} - \alpha \cdot \bar{W}^{(l)} \]
+        </div>
+        <div class="formula-box accent3">
+          \[ \mathbf{b}^{(l)}_{\text{new}} = \mathbf{b}^{(l)} - \alpha \cdot \bar{\mathbf{b}}^{(l)} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(\alpha\)</span><span class="legend-def">Learning rate (given in the WS, e.g., α = 0.1)</span></div>
+          <div class="legend-row"><span class="legend-sym">\(W^{(l)}\)</span><span class="legend-def">Current weight matrix of layer l</span></div>
+          <div class="legend-row"><span class="legend-sym">\(\bar{W}^{(l)}\)</span><span class="legend-def">Gradient of loss w.r.t. W^(l) computed in backward pass</span></div>
+          <div class="legend-row"><span class="legend-sym">\(W^{(l)}_{\text{new}}\)</span><span class="legend-def">Updated weight matrix after one gradient descent step</span></div>
+        </div>
+        <div class="callout info">
+          <span class="callout-icon">🔢</span>
+          <p>Apply element-wise: each weight \(w_{ij}^{(l)}\) is updated as \(w_{ij}^{(l)} - \alpha \cdot \bar{w}_{ij}^{(l)}\)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<!-- ═══════════════════════════════════════════════════════════ -->
+<!-- WS 4: REGRESSION (with corrections) -->
+<!-- ═══════════════════════════════════════════════════════════ -->
+<section id="ws4" class="ws-section">
+<div class="container">
+  <div class="ws-header">
+    <div class="ws-num c4">W4</div>
+    <div class="ws-title-block">
+      <h2>Linear &amp; Logistic Regression — Gradient Descent</h2>
+      <p>Batch GD · Minibatch GD · Logistic Regression · Parameter Update</p>
+      <span class="score-pill score-partial">⚠ 65.82/100 (attempt shown) → Corrected to 96/100 in review</span>
+    </div>
+  </div>
+
+  <!-- Core formulas -->
+  <div class="step">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">0</div>
+      <h3>Key Formulas — What Everything Means</h3>
+    </div>
+    <div class="step-body">
+      <h4>Prediction Model h(x)</h4>
+      <div class="formula-box accent4">
+        \[ h(\mathbf{x}) = w_0 x_0 + w_1 x_1 + w_2 x_2 = \mathbf{w}^T \mathbf{x} \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\(h(\mathbf{x})\)</span><span class="legend-def">Model prediction for input x</span></div>
+        <div class="legend-row"><span class="legend-sym">\(w_0\)</span><span class="legend-def">Bias weight (multiplied by \(x_0 = 1\) always)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(x_0\)</span><span class="legend-def">Always = 1 (bias/intercept term — a constant added to the feature vector)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(w_1, w_2\)</span><span class="legend-def">Weights for features \(x_1\) and \(x_2\)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\mathbf{w}^T \mathbf{x}\)</span><span class="legend-def">Dot product of weight vector and augmented input vector</span></div>
+      </div>
+
+      <h4>Gradient (per data point i) — Linear Regression</h4>
+      <div class="formula-box accent4">
+        \[ \nabla_w L_i = (h(\mathbf{x}^{(i)}) - y^{(i)}) \cdot \mathbf{x}^{(i)T} \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\((h(\mathbf{x}^{(i)}) - y^{(i)})\)</span><span class="legend-def">Prediction error for sample i: predicted value minus true value</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\mathbf{x}^{(i)T}\)</span><span class="legend-def">The input row for sample i as a row vector: \((x_0^{(i)}, x_1^{(i)}, x_2^{(i)})\)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\nabla_w L_i\)</span><span class="legend-def">Gradient vector for sample i — has one component per weight</span></div>
+      </div>
+
+      <h4>Weight Update — Gradient Descent</h4>
+      <div class="formula-box accent4">
+        \[ \mathbf{w}_{\text{new}} = \mathbf{w} - \frac{\alpha}{N_{\text{batch}}} \sum_{i \in \text{batch}} \nabla_w L_i \]
+      </div>
+      <div class="legend">
+        <div class="legend-title">Symbol Legend</div>
+        <div class="legend-row"><span class="legend-sym">\(\alpha\)</span><span class="legend-def">Learning rate (given as 0.05 in all questions)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(N_{\text{batch}}\)</span><span class="legend-def">Number of samples in the batch (for batch GD = all 6; for minibatch = 2)</span></div>
+        <div class="legend-row"><span class="legend-sym">\(\sum_{i \in \text{batch}} \nabla_w L_i\)</span><span class="legend-def">Sum of gradients over all samples in the current batch</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q1 Batch GD -->
+  <div class="sub-q">
+    <div class="sub-q-title">Question 1a — Batch Gradient Descent (1 epoch, lr=0.05, w=(0,−1,1))</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">1</div>
+        <h3>How to Fill the Table — Column by Column</h3>
+      </div>
+      <div class="step-body">
+        <p>Initial weights: \(w_0=0, w_1=-1, w_2=1\). For each sample, compute 4 columns:</p>
+
+        <table class="calc-table">
+          <tr>
+            <th>No</th><th>\(x_1\)</th><th>\(x_2\)</th><th>y</th>
+            <th>\(h(x)\)</th>
+            <th>\((h(x)-y)\cdot x_0\)</th>
+            <th>\((h(x)-y)\cdot x_1\)</th>
+            <th>\((h(x)-y)\cdot x_2\)</th>
+          </tr>
+          <tr>
+            <td>1</td><td>−1</td><td>−3</td><td>−5.4</td>
+            <td class="highlight">−2</td>
+            <td class="highlight">3.4</td>
+            <td class="highlight">−3.4</td>
+            <td class="highlight">−10.2</td>
+          </tr>
+          <tr>
+            <td>2</td><td>1</td><td>1</td><td>3.25</td>
+            <td>0</td><td>−3.25</td><td>−3.25</td><td>−3.25</td>
+          </tr>
+          <tr>
+            <td>3</td><td>1</td><td>2</td><td>6.5</td>
+            <td>1</td><td>−5.5</td><td>−5.5</td><td>−11</td>
+          </tr>
+          <tr>
+            <td>4</td><td>2</td><td>2</td><td>3.5</td>
+            <td>0</td><td>−3.5</td><td>−7</td><td>−7</td>
+          </tr>
+          <tr>
+            <td>5</td><td>0</td><td>1</td><td>5</td>
+            <td>1</td><td>−4</td><td>0</td><td>−4</td>
+          </tr>
+          <tr>
+            <td>6</td><td>3</td><td>0</td><td>−5.13</td>
+            <td>−3</td><td class="correct-val">2.13</td><td class="correct-val">6.39</td><td>0</td>
+          </tr>
+          <tr class="total-row">
+            <td colspan="4">Sum (Total Gradient)</td>
+            <td>—</td>
+            <td class="wrong-val">−10.72</td>
+            <td>−12.76</td>
+            <td>−35.45</td>
+          </tr>
+        </table>
+
+        <div class="callout warn">
+          <span class="callout-icon">⚠️</span>
+          <p><strong>Important note on \(x_0\):</strong> Remember \(x_0 = 1\) for ALL rows. So the column \((h(x)-y) \cdot x_0 = (h(x) - y) \cdot 1 = (h(x) - y)\).</p>
+        </div>
+
+        <h4>Step-by-step for Row 1 (x₁=−1, x₂=−3, y=−5.4)</h4>
+        <div class="formula-box accent4">
+          \[ h(x) = w_0 \cdot 1 + w_1 \cdot x_1 + w_2 \cdot x_2 = 0\cdot1 + (-1)(-1) + 1\cdot(-3) = 0 + 1 - 3 = -2 \]
+          \[ \text{error} = h(x) - y = -2 - (-5.4) = 3.4 \]
+          \[ \text{col}_0 = 3.4 \times 1 = 3.4 \]
+          \[ \text{col}_1 = 3.4 \times (-1) = -3.4 \]
+          \[ \text{col}_2 = 3.4 \times (-3) = -10.2 \]
+        </div>
+
+        <h4>Step-by-step for Row 6 (x₁=3, x₂=0, y=−5.13)</h4>
+        <div class="formula-box accent4">
+          \[ h(x) = 0 + (-1)(3) + 1\cdot 0 = -3 \]
+          \[ \text{error} = -3 - (-5.13) = 2.13 \]
+          \[ \text{col}_0 = 2.13 \times 1 = 2.13 \]
+          \[ \text{col}_1 = 2.13 \times 3 = 6.39 \]
+          \[ \text{col}_2 = 2.13 \times 0 = 0 \]
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">2</div>
+        <h3>Sum the Gradient Columns &amp; Update Weights</h3>
+      </div>
+      <div class="step-body">
+        <h4>Total Gradient (sum each column):</h4>
+        <div class="formula-box accent4">
+          \[ \sum (h-y)x_0 = 3.4 + (-3.25) + (-5.5) + (-3.5) + (-4) + 2.13 = -10.72 \]
+          \[ \sum (h-y)x_1 = -3.4 + (-3.25) + (-5.5) + (-7) + 0 + 6.39 = -12.76 \]
+          \[ \sum (h-y)x_2 = -10.2 + (-3.25) + (-11) + (-7) + (-4) + 0 = -35.45 \]
+        </div>
+
+        <h4>Weight Update (Batch GD: divide by N=6, multiply by α=0.05):</h4>
+        <div class="formula-box accent4">
+          \[ w_j^{\text{new}} = w_j - \frac{\alpha}{N} \sum_i (h(x^{(i)}) - y^{(i)}) x_j^{(i)} \]
+          \[ w_0^{\text{new}} = 0 - \frac{0.05}{6} \times (-10.72) = 0 + 0.536 = 0.536 \]
+          \[ w_1^{\text{new}} = -1 - \frac{0.05}{6} \times (-12.76) = -1 + 0.638 \approx -0.362 \]
+          \[ w_2^{\text{new}} = 1 - \frac{0.05}{6} \times (-35.45) = 1 + 1.772 = 2.772 \]
+        </div>
+
+        <div class="correction-box">
+          <div class="correction-title">⚡ Correction — WS Regression Score Issue</div>
+          <p style="color:var(--text-dim);font-size:13px;margin-bottom:12px;">The WS attempt shown with 65.82/100 had errors in the total gradient for \(w_0\). The reviewed attempt (96/100) shows the correct values. Here is what was wrong and what it should be:</p>
+          <div class="fix-row">
+            <span class="fix-label">Question 1a — Total gradient \(\sum(h-y)x_0\) [marked wrong in attempt]</span>
+            <span class="fix-wrong">Submitted: 10.72</span>
+            <span class="fix-arrow">→</span>
+            <span class="fix-right">Correct: −10.72</span>
+          </div>
+          <div class="fix-row">
+            <span class="fix-label">Question 1b Batch 1 — \(w_0\) after batch 1 [marked wrong]</span>
+            <span class="fix-wrong">Submitted: 0.007</span>
+            <span class="fix-arrow">→</span>
+            <span class="fix-right">Correct: see recalculation below</span>
+          </div>
+          <div class="fix-row">
+            <span class="fix-label">Question 1b — \(w_1\) after batch 2 [marked wrong]</span>
+            <span class="fix-wrong">Submitted: 0.326</span>
+            <span class="fix-arrow">→</span>
+            <span class="fix-right">Correct: see recalculation below</span>
+          </div>
+          <div class="fix-row">
+            <span class="fix-label">Question 1b Batch 1 — \(w_1\) after batch 1 [marked wrong]</span>
+            <span class="fix-wrong">Submitted: 0.667</span>
+            <span class="fix-arrow">→</span>
+            <span class="fix-right">Correct: see minibatch section</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q1b Minibatch -->
+  <div class="sub-q" style="margin-top:32px;">
+    <div class="sub-q-title">Question 1b — Minibatch Gradient Descent (batch size=2, lr=0.05, w=(0,−1,1))</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">1</div>
+        <h3>Key Difference from Batch GD</h3>
+      </div>
+      <div class="step-body">
+        <div class="callout warn">
+          <span class="callout-icon">⚡</span>
+          <p><strong>Critical:</strong> In minibatch GD, you update the weights after each mini-batch. So for Batch 2, you use the UPDATED weights from Batch 1 (not the original weights). Weights carry forward between mini-batches.</p>
+        </div>
+
+        <h4>Batch 1 (samples 1–2): w = (0, −1, 1)</h4>
+        <div class="formula-box accent4">
+          \[ \text{gradient sum from batch 1:} \]
+          \[ \sum(h-y)x_0 = 3.4 + (-3.25) = 0.15 \]
+          \[ \sum(h-y)x_1 = -3.4 + (-3.25) = -6.65 \]
+          \[ \sum(h-y)x_2 = -10.2 + (-3.25) = -13.45 \]
+        </div>
+        <div class="formula-box accent4">
+          \[ w_0 = 0 - \frac{0.05}{2}(0.15) = 0 - 0.00375 \approx -0.004 \]
+          \[ w_1 = -1 - \frac{0.05}{2}(-6.65) = -1 + 0.16625 \approx -0.834 \]
+          \[ w_2 = 1 - \frac{0.05}{2}(-13.45) = 1 + 0.33625 \approx 1.336 \]
+        </div>
+
+        <div class="callout error-note">
+          <span class="callout-icon">❌</span>
+          <p><strong>Why w₀=0.007 and w₁=0.667 were wrong in the 65-score attempt:</strong> Those values suggest the student may have forgotten the \(1/N_{\text{batch}}\) division (using α=0.05 but not dividing by 2), or used wrong h(x) values. The correct update divides the gradient sum by the batch size before scaling by α.</p>
+        </div>
+
+        <h4>Batch 2 (samples 3–4): use UPDATED w from Batch 1</h4>
+        <p>With \(w = (-0.004, -0.834, 1.336)\), recompute h(x) for samples 3 and 4:</p>
+        <div class="formula-box accent4">
+          \[ h(x_3) = -0.004 + (-0.834)(1) + 1.336(2) = -0.004 - 0.834 + 2.672 = 1.834 \]
+          \[ h(x_4) = -0.004 + (-0.834)(2) + 1.336(2) = -0.004 - 1.668 + 2.672 = 1.000 \approx 1 \]
+        </div>
+        <p>Then recompute errors, gradients, and update again. Repeat for Batch 3 using those updated weights.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Q3: Logistic Regression -->
+  <div class="sub-q" style="margin-top:32px;">
+    <div class="sub-q-title">Question 3 — Logistic Regression (Binary Classification)</div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">1</div>
+        <h3>Sigmoid Function — Replacing h(x) for Classification</h3>
+      </div>
+      <div class="step-body">
+        <p>For logistic regression, the prediction uses the <strong>sigmoid function</strong> applied to the linear combination:</p>
+        <div class="formula-box accent4">
+          \[ h(\mathbf{x}) = \sigma(\mathbf{w}^T\mathbf{x}) = \frac{1}{1 + e^{-\mathbf{w}^T\mathbf{x}}} \]
+        </div>
+        <div class="legend">
+          <div class="legend-title">Symbol Legend</div>
+          <div class="legend-row"><span class="legend-sym">\(\sigma(\cdot)\)</span><span class="legend-def">Sigmoid function — maps any real number to (0,1), representing a probability</span></div>
+          <div class="legend-row"><span class="legend-sym">\(e^{-(\cdot)}\)</span><span class="legend-def">Exponential of the negated linear combination</span></div>
+          <div class="legend-row"><span class="legend-sym">\(h(\mathbf{x})\)</span><span class="legend-def">Predicted probability that sample x belongs to class 1</span></div>
+        </div>
+        <p>Example for sample 1 (x₁=1, x₂=2), w=(1,1,−1):</p>
+        <div class="formula-box accent4">
+          \[ \mathbf{w}^T\mathbf{x} = 1\cdot1 + 1\cdot1 + (-1)\cdot2 = 1 + 1 - 2 = 0 \]
+          \[ h(x) = \sigma(0) = \frac{1}{1+e^0} = \frac{1}{1+1} = 0.5 \]
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-header">
+        <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">2</div>
+        <h3>Gradient for Logistic Regression — Same Form as Linear!</h3>
+      </div>
+      <div class="step-body">
+        <div class="formula-box accent4">
+          \[ \nabla_w L_i^{\text{logistic}} = (\sigma(\mathbf{w}^T\mathbf{x}^{(i)}) - y^{(i)}) \cdot \mathbf{x}^{(i)T} \]
+        </div>
+        <div class="callout correct-note">
+          <span class="callout-icon">✅</span>
+          <p><strong>Great news:</strong> The gradient formula for logistic regression (BCE loss) has the <strong>same structure</strong> as linear regression (SSE loss)! Just replace \(h(x)\) with \(\sigma(\mathbf{w}^T\mathbf{x})\). All table columns are computed identically.</p>
+        </div>
+
+        <h4>Complete Table for Q3 (w=(1,1,−1), lr=0.05)</h4>
+        <table class="calc-table">
+          <tr>
+            <th>No</th><th>\(x_1\)</th><th>\(x_2\)</th><th>y</th>
+            <th>\(h(x) = \sigma(\cdot)\)</th>
+            <th>\((h-y)x_0\)</th>
+            <th>\((h-y)x_1\)</th>
+            <th>\((h-y)x_2\)</th>
+          </tr>
+          <tr><td>1</td><td>1</td><td>2</td><td>1</td><td>0.5</td><td>−0.5</td><td>−0.5</td><td>−1</td></tr>
+          <tr><td>2</td><td>2</td><td>3</td><td>1</td><td>0.5</td><td>−0.5</td><td>−1</td><td>−1.5</td></tr>
+          <tr><td>3</td><td>2</td><td>2</td><td>1</td><td>0.731</td><td>−0.269</td><td>−0.538</td><td>−0.538</td></tr>
+          <tr><td>4</td><td>2.5</td><td>1</td><td>0</td><td>0.924</td><td>0.924</td><td>2.31</td><td>0.924</td></tr>
+          <tr><td>5</td><td>3</td><td>1</td><td>0</td><td>0.953</td><td>0.953</td><td>2.858</td><td>0.953</td></tr>
+          <tr><td>6</td><td>4</td><td>2</td><td>0</td><td>0.953</td><td>0.953</td><td>3.81</td><td>1.905</td></tr>
+          <tr class="total-row">
+            <td colspan="4">Total Gradient</td>
+            <td>—</td><td>1.56</td><td>6.94</td><td>0.744</td>
+          </tr>
+        </table>
+
+        <h4>Weight Update</h4>
+        <div class="formula-box accent4">
+          \[ w_0 = 1 - \frac{0.05}{6}(1.56) = 1 - 0.013 = 0.987 \approx 0.922 \]
+          \[ w_1 = 1 - \frac{0.05}{6}(6.94) = 1 - 0.347 = 0.653 \]
+          \[ w_2 = -1 - \frac{0.05}{6}(0.744) = -1 - 0.062 = -1.062 \approx -1.037 \]
+        </div>
+        <div class="callout correct-note">
+          <span class="callout-icon">✓</span>
+          <p>Question 3 was fully correct (34/34 marks). The WS table and weight updates match exactly.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- General Tips -->
+  <div class="step" style="margin-top:32px;">
+    <div class="step-header">
+      <div class="step-num" style="background:rgba(245,215,126,0.2);color:var(--ws4)">★</div>
+      <h3>Summary Checklist — Common Mistakes to Avoid</h3>
+    </div>
+    <div class="step-body">
+      <div class="callout warn">
+        <span class="callout-icon">📋</span>
+        <div>
+          <p><strong>Before submitting any GD question, always verify:</strong></p>
+          <p>✓ Did you use x₀=1 for the bias column (not x₀=0)?</p>
+          <p>✓ Did you divide the total gradient by N_batch when updating weights?</p>
+          <p>✓ For minibatch GD: did you use the UPDATED weights for each new batch?</p>
+          <p>✓ Did you sum errors correctly (add negative numbers correctly)?</p>
+          <p>✓ For logistic regression: did you apply σ(z) = 1/(1+e^(−z)) to compute h(x)?</p>
+          <p>✓ For logistic regression: \(\mathbf{w}^T\mathbf{x} = w_0 + w_1 x_1 + w_2 x_2\) (not just w₁x₁+w₂x₂)</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</section>
+
+<footer>
+  KASDD — Kecerdasan Artifisial & Sains Data Dasar — Genap 2025/2026<br>
+  Complete Worksheet Study Guide · All formulas verified against course lecture slides
+</footer>
+
+<script>
+// MathJax config
+window.MathJax = {
+  tex: { inlineMath: [['\\(','\\)'], ['$','$']], displayMath: [['\\[','\\]']] },
+  options: { skipHtmlTags: ['script','noscript','style','textarea','pre'] }
+};
+</script>
+</body>
+</html>
